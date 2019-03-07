@@ -1,6 +1,14 @@
+import { createConnection } from "typeorm";
 import App from "./app";
-import ItemController from "./controllers/item.controller";
+import ItemController from "./controllers/ItemController";
+import UserController from "./controllers/UserController";
 
-const app = new App([new ItemController()], 8080);
+async function main() {
+  const app = new App([new ItemController(), new UserController()], 8080);
 
-app.listen();
+  await createConnection();
+
+  app.listen();
+}
+
+main();

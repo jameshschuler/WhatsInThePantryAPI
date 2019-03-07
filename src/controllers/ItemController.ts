@@ -1,5 +1,5 @@
 import * as express from "express";
-import BaseController from "./base.controller";
+import BaseController from "./BaseController";
 
 class ItemController extends BaseController {
   public path = this.basePath + "/item";

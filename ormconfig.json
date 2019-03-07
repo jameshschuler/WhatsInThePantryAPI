@@ -1,0 +1,12 @@
+{
+  "name": "default",
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "username": "jschuler5446",
+  "password": "jschuler5446",
+  "database": "whatsinthepantry",
+  "synchronize": true,
+  "logging": true,
+  "entities": ["src/entity/*.*"]
+}

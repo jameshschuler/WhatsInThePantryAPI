@@ -1,5 +1,6 @@
-import * as cors from "cors";
-import * as express from "express";
+import bodyparser from "body-parser";
+import cors from "cors";
+import express from "express";
 
 export default class App {
   public app: express.Application;
@@ -15,6 +16,7 @@ export default class App {
 
   private initializeMiddlewares() {
     this.app.use(cors());
+    this.app.use(bodyparser.json());
   }
 
   private initializeControllers(controllers: Array<any>) {
