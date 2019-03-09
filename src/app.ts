@@ -21,7 +21,7 @@ export default class App {
 
   private initializeControllers(controllers: Array<any>) {
     controllers.forEach(controller => {
-      this.app.use("/", controller.router);
+      this.app.use("/api", controller.router);
     });
   }
 

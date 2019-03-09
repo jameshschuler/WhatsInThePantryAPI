@@ -1,20 +1,18 @@
 import * as express from "express";
-import BaseController from "./BaseController";
 
-class ItemController extends BaseController {
-  public path = this.basePath + "/item";
+class ItemController {
+  public path = "/item";
   public router = express.Router();
 
   constructor() {
-    super();
-
     this.initializeRoutes();
   }
-  public initializeRoutes() {
+
+  private initializeRoutes() {
     this.router.get(this.path, this.getItem);
   }
 
-  getItem = (_: express.Request, response: express.Response) => {
+  public getItem = (_: express.Request, response: express.Response) => {
     response.send("getItem");
   };
 }
