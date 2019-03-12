@@ -1,6 +1,7 @@
 import bodyparser from "body-parser";
 import cors from "cors";
 import express from "express";
+import cookieParser = require("cookie-parser");
 
 export default class App {
   public app: express.Application;
@@ -17,6 +18,7 @@ export default class App {
   private initializeMiddlewares() {
     this.app.use(cors());
     this.app.use(bodyparser.json());
+    this.app.use(cookieParser());
   }
 
   private initializeControllers(controllers: Array<any>) {

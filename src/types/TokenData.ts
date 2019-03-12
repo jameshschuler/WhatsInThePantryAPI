@@ -6,7 +6,7 @@ export default interface TokenData {
   expiresIn: number;
 }
 
-interface DataStoredInToken {
+export interface DataStoredInToken {
   id: number;
   username: string;
 }

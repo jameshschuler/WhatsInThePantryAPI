@@ -12,7 +12,10 @@ class ItemController {
     this.router.get(this.path, this.getItem);
   }
 
-  public getItem = (_: express.Request, response: express.Response) => {
+  public getItem = (req: express.Request, response: express.Response) => {
+    console.log(req.headers);
+
+    // TODO: test validating headers / token
     response.send("getItem");
   };
 }

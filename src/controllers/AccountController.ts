@@ -1,13 +1,17 @@
 import * as express from "express";
+import LoginDto from "../dto/LoginDto";
 import { AccountService } from "../services/AccountService";
+import BaseController from "./BaseController";
 
-class AccountController {
+class AccountController extends BaseController {
   public path = "/account";
   public router = express.Router();
 
   private accountService: AccountService;
 
   constructor() {
+    super();
+
     this.accountService = new AccountService();
 
     this.initializeRoutes();
@@ -19,7 +23,8 @@ class AccountController {
 
   public login = async (req: express.Request, res: express.Response) => {
     try {
-      // TODO: validate using LoginDto
+      await this.validateModelState(LoginDto, req.body);
+
       const { usernameOrEmail, password } = req.body;
 
       const data = await this.accountService.login(usernameOrEmail, password);

@@ -1,11 +1,12 @@
-import { IsEmail, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 class LoginDto {
-  @IsEmail()
   @IsString()
-  public email: string;
+  @IsNotEmpty({ message: "Must enter a valid email or username." })
+  public usernameOrEmail: string;
 
-  @IsString()
+  @IsString({})
+  @IsNotEmpty({ message: "Must enter a password." })
   public password: string;
 }
 
