@@ -1,5 +1,15 @@
-import { IsNotEmpty, Length } from "class-validator";
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Exclude } from "class-transformer";
+import { Length } from "class-validator";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn
+} from "typeorm";
+import { ItemAmount } from "./ItemAmount";
+import { ItemCategory } from "./ItemCategory";
+import { ItemLocation } from "./ItemLocation";
 
 @Entity()
 export class Item extends BaseEntity {
@@ -12,23 +22,22 @@ export class Item extends BaseEntity {
   })
   name: string;
 
-  @Column()
-  @IsNotEmpty()
+  @Column({ nullable: true })
   price: string;
 
-  @Column()
-  @IsNotEmpty()
+  @Column({ nullable: true })
   unit: string;
 
-  @Column()
-  defaultItemAmountId: number;
+  @ManyToOne(() => ItemAmount, itemAmount => itemAmount.items)
+  itemAmount: ItemAmount;
 
-  @Column()
-  categoryId: number;
+  @ManyToOne(() => ItemCategory, itemCategory => itemCategory.items)
+  itemCategory: ItemCategory;
 
-  @Column()
-  defaultLocationId: number;
+  @ManyToOne(() => ItemLocation, itemLocation => itemLocation.items)
+  itemLocation: ItemLocation;
 
+  @Exclude()
   @Column()
   createdBy: number;
 

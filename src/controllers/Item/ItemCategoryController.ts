@@ -1,20 +1,20 @@
 import * as express from "express";
 import RequestWithUser from "../../dto/RequestWithUser";
 import authMiddleware from "../../middleware/Auth.middleware";
-import { ItemLocationService } from "../../services/item/ItemLocationService";
+import { ItemCategoryService } from "../../services/item/ItemCategoryService";
 import BaseController from "../BaseController";
 
-class ItemLocationController extends BaseController {
-  public path = "/item_location";
-  public router = express.Router();
+class ItemCategoryController extends BaseController {
+  private path = "/item_category";
+  private router = express.Router();
 
-  private itemLocationService: ItemLocationService;
+  private itemCategoryService: ItemCategoryService;
 
   constructor() {
     super();
     this.initializeRoutes();
 
-    this.itemLocationService = new ItemLocationService();
+    this.itemCategoryService = new ItemCategoryService();
   }
 
   /**
@@ -24,22 +24,22 @@ class ItemLocationController extends BaseController {
     this.router.get(
       this.path + "/:id",
       authMiddleware,
-      this.getItemLocationById
+      this.getItemCategoryById
     );
-    this.router.get(this.path, authMiddleware, this.getItemLocations);
+    this.router.get(this.path, authMiddleware, this.getItemCategories);
   }
 
   /**
    *
    */
-  public getItemLocations = async (
+  public getItemCategories = async (
     _: RequestWithUser,
     res: express.Response
   ) => {
     try {
-      const itemLocations = await this.itemLocationService.getItemLocations();
+      const itemCategories = await this.itemCategoryService.getItemCategories();
 
-      res.status(200).json({ itemLocations });
+      res.status(200).json({ itemCategories });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,
@@ -51,17 +51,17 @@ class ItemLocationController extends BaseController {
   /**
    *
    */
-  public getItemLocationById = async (
+  public getItemCategoryById = async (
     req: RequestWithUser,
     res: express.Response
   ) => {
     try {
       const id = req.params.id;
-      const itemLocation = await this.itemLocationService.getItemLocationById(
+      const itemCategory = await this.itemCategoryService.getItemCategoryById(
         id
       );
 
-      res.status(200).json({ itemLocation });
+      res.status(200).json({ itemCategory });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,
@@ -71,4 +71,4 @@ class ItemLocationController extends BaseController {
   };
 }
 
-export default ItemLocationController;
+export default ItemCategoryController;
