@@ -1,15 +1,10 @@
 import { Length } from "class-validator";
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import Audit from "./Audit";
 import { Item } from "./Item";
 
 @Entity()
-export class ItemAmount extends BaseEntity {
+export class ItemAmount extends Audit {
   @PrimaryGeneratedColumn()
   id: number;
 

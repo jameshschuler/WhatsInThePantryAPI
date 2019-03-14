@@ -8,8 +8,14 @@ export default class BaseController implements IController {
   public path: string;
   public router: express.Router;
 
-  public async validateModelState(type: any, body: express.Request) {
-    const errors = await validate(plainToClass(type, body));
+  public async validateModelState(
+    type: any,
+    body: express.Request,
+    skipMissingProperties = false
+  ) {
+    const errors = await validate(plainToClass(type, body), {
+      skipMissingProperties
+    });
     if (errors.length > 0) {
       let parsedErrors = [];
       for (let error of errors) {

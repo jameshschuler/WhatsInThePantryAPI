@@ -32,7 +32,9 @@ class ItemController extends BaseController {
       this.getItemsByLocation
     );
     this.router.get(this.path, authMiddleware, this.getItems);
+    this.router.get(`${this.path}/me`, authMiddleware, this.getItemsByUserId);
     this.router.post(this.path, authMiddleware, this.createItem);
+    this.router.put(this.path, authMiddleware, this.updateItem);
   }
 
   /**
@@ -58,9 +60,51 @@ class ItemController extends BaseController {
   /**
    *
    */
+  public updateItem = async (req: RequestWithUser, res: express.Response) => {
+    try {
+      await this.validateModelState(ItemDto, req.body, true);
+      const itemDto = plainToClass(ItemDto, req.body as ItemDto);
+      const user = req.user!;
+
+      const item = await this.itemService.update(itemDto, user.id);
+      const plainItem = plainToClass(Item, item);
+
+      res.status(200).json({ item: plainItem });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
+
+  /**
+   *
+   */
   public getItems = async (_: RequestWithUser, res: express.Response) => {
     try {
       const items = await this.itemService.getItems();
+      const plainItems = plainToClass(Item, items);
+
+      res.status(200).json({ items: plainItems });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
+
+  /**
+   *
+   */
+  public getItemsByUserId = async (
+    req: RequestWithUser,
+    res: express.Response
+  ) => {
+    try {
+      const user = req.user!;
+      const items = await this.itemService.getItemsByUserId(user.id);
       const plainItems = plainToClass(Item, items);
 
       res.status(200).json({ items: plainItems });
