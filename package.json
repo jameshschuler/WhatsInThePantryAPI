@@ -1,7 +1,7 @@
 {
   "name": "WhatsInThePantryAPI",
   "version": "1.0.0",
-  "description": "",
+  "description": "REST API to support WhatsInThePantry web application",
   "main": "app.ts",
   "scripts": {
     "build": "tsc",
@@ -9,8 +9,13 @@
     "start": "ts-node-dev src/server.ts",
     "prod": "npm run build && npm run start"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "Typescript",
+    "Express",
+    "PostgresSQL",
+    "Node"
+  ],
+  "author": "James Schuler",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
