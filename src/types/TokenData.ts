@@ -14,7 +14,7 @@ export interface DataStoredInToken {
 // TODO: move to service?
 export const createToken = (user: User) => {
   const expiresIn = 60 * 60 * 24; // a day
-  const secret = "MySuperSecretJWTPasscode"; //TODO: process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET;
   const dataStoredInToken: DataStoredInToken = {
     id: user.id,
     username: user.username
