@@ -1,5 +1,5 @@
 import * as express from "express";
-import LoginDto from "../dto/LoginDto";
+import LoginDto from "../models/dto/LoginDto";
 import { AccountService } from "../services/AccountService";
 import BaseController from "./BaseController";
 
@@ -21,6 +21,9 @@ class AccountController extends BaseController {
     this.router.post(this.path + "/login", this.login);
   }
 
+  /**
+   *
+   */
   public login = async (req: express.Request, res: express.Response) => {
     try {
       await this.validateModelState(LoginDto, req.body);

@@ -1,9 +1,13 @@
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import express from "express";
-import { ValidationException } from "../exceptions/ValidationException";
+import { ValidationException } from "../utils/exceptions/ValidationException";
+import IController from "./IController";
 
-export default class BaseController {
+export default class BaseController implements IController {
+  public path: string;
+  public router: express.Router;
+
   public async validateModelState(type: any, body: express.Request) {
     const errors = await validate(plainToClass(type, body));
     if (errors.length > 0) {

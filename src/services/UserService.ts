@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import { validate } from "class-validator";
-import { RegisterDto } from "../dto/RegisterDto";
-import { User } from "../entity/User";
-import { ValidationException } from "../exceptions/ValidationException";
+import { RegisterDto } from "../models/dto/RegisterDto";
+import { User } from "../models/entity/User";
+import { ValidationException } from "../utils/exceptions/ValidationException";
 
 export class UserService {
   constructor() {}

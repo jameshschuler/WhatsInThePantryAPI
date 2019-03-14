@@ -1,14 +1,15 @@
 import { plainToClass } from "class-transformer";
 import * as express from "express";
-import RequestWithUser from "../../dto/RequestWithUser";
-import { Item } from "../../entity/Item";
-import authMiddleware from "../../middleware/Auth.middleware";
+import ItemDto from "../../models/dto/Item/ItemDto";
+import RequestWithUser from "../../models/dto/RequestWithUser";
+import { Item } from "../../models/entity/Item";
 import { ItemService } from "../../services/item/ItemService";
+import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
 
 class ItemController extends BaseController {
-  private path = "/item";
-  private router = express.Router();
+  public path = "/item";
+  public router = express.Router();
 
   private itemService: ItemService;
 
@@ -20,8 +21,39 @@ class ItemController extends BaseController {
   }
 
   private initializeRoutes() {
+    this.router.get(
+      this.path + "/category/:id",
+      authMiddleware,
+      this.getItemsByCategory
+    );
+    this.router.get(
+      this.path + "/location/:id",
+      authMiddleware,
+      this.getItemsByLocation
+    );
     this.router.get(this.path, authMiddleware, this.getItems);
+    this.router.post(this.path, authMiddleware, this.createItem);
   }
+
+  /**
+   *
+   */
+  public createItem = async (req: RequestWithUser, res: express.Response) => {
+    try {
+      await this.validateModelState(ItemDto, req.body);
+      const itemDto = plainToClass(ItemDto, req.body as ItemDto);
+      const user = req.user!;
+
+      const item = await this.itemService.create(itemDto, user.id);
+
+      res.status(200).json({ item });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
 
   /**
    *
@@ -29,6 +61,48 @@ class ItemController extends BaseController {
   public getItems = async (_: RequestWithUser, res: express.Response) => {
     try {
       const items = await this.itemService.getItems();
+      const plainItems = plainToClass(Item, items);
+
+      res.status(200).json({ items: plainItems });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
+
+  /**
+   *
+   */
+  public getItemsByCategory = async (
+    req: RequestWithUser,
+    res: express.Response
+  ) => {
+    try {
+      const id = req.params.id;
+      const items = await this.itemService.getItemsByCategory(id);
+      const plainItems = plainToClass(Item, items);
+
+      res.status(200).json({ items: plainItems });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
+
+  /**
+   *
+   */
+  public getItemsByLocation = async (
+    req: RequestWithUser,
+    res: express.Response
+  ) => {
+    try {
+      const id = req.params.id;
+      const items = await this.itemService.getItemsByLocation(id);
       const plainItems = plainToClass(Item, items);
 
       res.status(200).json({ items: plainItems });

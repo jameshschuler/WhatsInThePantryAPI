@@ -1,9 +1,10 @@
 import bcrypt from "bcryptjs";
 import { Validator } from "class-validator";
-import LoggedInDto from "../dto/LoggedInDto";
-import { User } from "../entity/User";
-import { ValidationException } from "../exceptions/ValidationException";
-import { createToken } from "../types/TokenData";
+import jwt from "jsonwebtoken";
+import LoggedInDto from "../models//dto/LoggedInDto";
+import { User } from "../models/entity/User";
+import { ValidationException } from "../utils/exceptions/ValidationException";
+import { DataStoredInToken } from "../utils/interfaces";
 
 export class AccountService {
   private validator: Validator;
@@ -45,7 +46,7 @@ export class AccountService {
           lastName: user.lastName,
           username: user.username,
           email: user.email,
-          token: createToken(user)
+          token: this.createToken(user)
         };
       }
 
@@ -56,6 +57,23 @@ export class AccountService {
         "Invalid credentials."
       ]);
     }
+  }
+
+  /**
+   *
+   * @param user
+   */
+  createToken(user: User) {
+    const expiresIn = 60 * 60 * 24; // a day
+    const secret = process.env.JWT_SECRET!;
+    const dataStoredInToken: DataStoredInToken = {
+      id: user.id,
+      username: user.username
+    };
+    return {
+      expiresIn,
+      token: jwt.sign(dataStoredInToken, secret, { expiresIn })
+    };
   }
 
   /**

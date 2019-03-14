@@ -1,14 +1,18 @@
+import { plainToClass } from "class-transformer";
 import express from "express";
-import { RegisterDto } from "../dto/RegisterDto";
+import { RegisterDto } from "../models/dto/RegisterDto";
 import { UserService } from "../services/UserService";
+import BaseController from "./BaseController";
 
-class UserController {
+class UserController extends BaseController {
   public path = "/user";
   public router = express.Router();
 
   private userService: UserService;
 
   constructor() {
+    super();
+
     this.userService = new UserService();
 
     this.initializeRoutes();
@@ -20,7 +24,9 @@ class UserController {
 
   public register = async (req: express.Request, res: express.Response) => {
     try {
-      const registerDto = new RegisterDto(req);
+      await this.validateModelState(RegisterDto, req.body);
+      const registerDto = plainToClass(RegisterDto, req.body as RegisterDto);
+
       const response = await this.userService.createUser(registerDto);
 
       // TODO: send welcome email

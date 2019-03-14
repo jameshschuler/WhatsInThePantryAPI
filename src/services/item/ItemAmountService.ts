@@ -1,5 +1,5 @@
-import { ItemAmount } from "../../entity/ItemAmount";
-import { ValidationException } from "../../exceptions/ValidationException";
+import { ItemAmount } from "../../models/entity/ItemAmount";
+import { ValidationException } from "../../utils/exceptions/ValidationException";
 
 export class ItemAmountService {
   constructor() {}

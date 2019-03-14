@@ -1,12 +1,12 @@
 import * as express from "express";
-import RequestWithUser from "../../dto/RequestWithUser";
-import authMiddleware from "../../middleware/Auth.middleware";
+import RequestWithUser from "../../models/dto/RequestWithUser";
 import { ItemCategoryService } from "../../services/item/ItemCategoryService";
+import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
 
 class ItemCategoryController extends BaseController {
-  private path = "/item_category";
-  private router = express.Router();
+  public path = "/item_category";
+  public router = express.Router();
 
   private itemCategoryService: ItemCategoryService;
 

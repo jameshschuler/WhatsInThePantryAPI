@@ -1,5 +1,5 @@
-import { ItemLocation } from "../../entity/ItemLocation";
-import { ValidationException } from "../../exceptions/ValidationException";
+import { ItemLocation } from "../../models/entity/ItemLocation";
+import { ValidationException } from "../../utils/exceptions/ValidationException";
 
 export class ItemLocationService {
   constructor() {}

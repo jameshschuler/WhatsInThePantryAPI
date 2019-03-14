@@ -1,8 +1,8 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
-import RequestWithUser from "../dto/RequestWithUser";
-import { User } from "../entity/User";
-import { DataStoredInToken } from "../types/TokenData";
+import RequestWithUser from "../../models/dto/RequestWithUser";
+import { User } from "../../models/entity/User";
+import { DataStoredInToken } from "../interfaces";
 
 const authMiddleware = async (
   req: RequestWithUser,
