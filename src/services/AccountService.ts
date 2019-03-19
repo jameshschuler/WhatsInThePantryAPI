@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Validator } from "class-validator";
 import jwt from "jsonwebtoken";
 import LoggedInDto from "../models//dto/LoggedInDto";
+import AccountDto from "../models/dto/account/AccountDto";
 import { User } from "../models/entity/User";
 import { ValidationException } from "../utils/exceptions/ValidationException";
 import { DataStoredInToken } from "../utils/interfaces";
@@ -55,6 +56,37 @@ export class AccountService {
     } else {
       throw new ValidationException("Login Error!", 400, [
         "Invalid credentials."
+      ]);
+    }
+  }
+
+  public async getLoggedInUser(user: User): Promise<LoggedInDto | null> {
+    if (user) {
+      return {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        token: this.createToken(user)
+      };
+    }
+
+    throw new ValidationException("Login Error!", 400, [
+      "Unable to login. Please try again."
+    ]);
+  }
+
+  public async getAccountInformation(user: User): Promise<AccountDto> {
+    if (user) {
+      return {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username
+      };
+    } else {
+      throw new ValidationException("NotFound", 404, [
+        "Unable to retrieve account information. Please try again."
       ]);
     }
   }

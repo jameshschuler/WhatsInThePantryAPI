@@ -19,7 +19,10 @@ const authMiddleware = async (
         secret
       )) as DataStoredInToken;
 
-      const user = await User.findOne(verificationResponse.id);
+      const user = await User.findOne({
+        id: verificationResponse.id,
+        username: verificationResponse.username
+      });
       if (user) {
         req.user = user;
         next();
