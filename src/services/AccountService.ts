@@ -3,7 +3,7 @@ import { Validator } from "class-validator";
 import jwt from "jsonwebtoken";
 import LoggedInDto from "../models//dto/LoggedInDto";
 import AccountDto from "../models/dto/account/AccountDto";
-import { User } from "../models/entity/User";
+import User from "../models/entity/User";
 import { ValidationException } from "../utils/exceptions/ValidationException";
 import { DataStoredInToken } from "../utils/interfaces";
 

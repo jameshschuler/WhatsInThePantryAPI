@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import RequestWithUser from "../../models/dto/RequestWithUser";
-import { User } from "../../models/entity/User";
+import User from "../../models/entity/User";
 import { DataStoredInToken } from "../interfaces";
 
 const authMiddleware = async (
@@ -20,9 +20,13 @@ const authMiddleware = async (
       )) as DataStoredInToken;
 
       const user = await User.findOne({
-        id: verificationResponse.id,
-        username: verificationResponse.username
+        where: {
+          id: verificationResponse.id,
+          username: verificationResponse.username
+        },
+        relations: ["items", "pantryUsers"]
       });
+
       if (user) {
         req.user = user;
         next();

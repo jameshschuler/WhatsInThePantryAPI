@@ -1,16 +1,24 @@
 import { Length, MaxLength } from "class-validator";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import Audit from "./Audit";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from "typeorm";
 import { ItemAmount } from "./ItemAmount";
 import { ItemCategory } from "./ItemCategory";
 import { ItemLocation } from "./ItemLocation";
+import MyBaseEntity from "./MyBaseEntity";
+import PantryItem from "./PantryItem";
+import User from "./User";
 
 @Entity()
-export class Item extends Audit {
+export default class Item extends MyBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 255 })
   @Length(1, 255, {
     message: "Item name must be between 1 and 255 characters."
   })
@@ -39,4 +47,10 @@ export class Item extends Audit {
 
   @ManyToOne(() => ItemLocation, itemLocation => itemLocation.items)
   itemLocation: ItemLocation;
+
+  @OneToMany(() => PantryItem, pantryItem => pantryItem.item)
+  pantryItems: PantryItem[];
+
+  @ManyToOne(() => User, user => user.items)
+  user: User;
 }

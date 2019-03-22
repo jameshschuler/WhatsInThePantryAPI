@@ -1,7 +1,7 @@
 import { Exclude } from "class-transformer";
 import { BaseEntity, Column } from "typeorm";
 
-export default class Audit extends BaseEntity {
+export default class MyBaseEntity extends BaseEntity {
   @Column({ nullable: true })
   @Exclude()
   createdBy: number;

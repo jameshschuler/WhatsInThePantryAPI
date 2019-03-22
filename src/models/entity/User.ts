@@ -1,29 +1,32 @@
 import { IsEmail, Length } from "class-validator";
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import Item from "./Item";
+import MyBaseEntity from "./MyBaseEntity";
+import PantryUser from "./PantryUser";
 
 @Entity()
-export class User extends BaseEntity {
+export default class User extends MyBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 255 })
   @Length(1, 255, {
     message: "First name must be between 1 and 255 characters."
   })
   firstName: string;
 
-  @Column()
+  @Column({ length: 255 })
   @Length(1, 255, {
     message: "Last name must be between 1 and 255 characters."
   })
   lastName: string;
 
-  @Column()
+  @Column({ length: 255 })
   @IsEmail({}, { message: "Email must be a valid email address." })
   @Length(1, 255, { message: "Email must be between 1 and 255 characters." })
   email: string;
 
-  @Column()
+  @Column({ length: 255 })
   @Length(1, 255, { message: "Username must be between 1 and 255 characters." })
   username: string;
 
@@ -34,9 +37,6 @@ export class User extends BaseEntity {
   isActive: boolean;
 
   @Column()
-  createdDate: Date;
-
-  @Column()
   loginFailureCount: number = 0;
 
   @Column({ nullable: true })
@@ -44,4 +44,10 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   lastLogin?: Date;
+
+  @OneToMany(() => Item, item => item.user)
+  items: Item[];
+
+  @OneToMany(() => PantryUser, pantryUser => pantryUser.user)
+  pantryUsers: PantryUser[];
 }

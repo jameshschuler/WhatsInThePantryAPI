@@ -1,12 +1,15 @@
-import { Column, Entity, Length, PrimaryGeneratedColumn } from "typeorm";
-import Audit from "./Audit";
+import { Length } from "class-validator";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import MyBaseEntity from "./MyBaseEntity";
+import PantryItem from "./PantryItem";
+import PantryUser from "./PantryUser";
 
 @Entity()
-export class Pantry extends Audit {
+export class Pantry extends MyBaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: "255" })
   @Length(1, 255, {
     message: "Pantry name must be between 1 and 255 characters."
   })
@@ -14,4 +17,10 @@ export class Pantry extends Audit {
 
   @Column({ default: false })
   isShared: boolean;
+
+  @OneToMany(() => PantryUser, pantryUser => pantryUser.pantry)
+  pantryUsers: PantryUser[];
+
+  @OneToMany(() => PantryItem, pantryItem => pantryItem.pantry)
+  pantryItems: PantryItem[];
 }

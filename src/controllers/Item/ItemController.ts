@@ -2,7 +2,7 @@ import { plainToClass } from "class-transformer";
 import * as express from "express";
 import ItemDto from "../../models/dto/Item/ItemDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
-import { Item } from "../../models/entity/Item";
+import Item from "../../models/entity/Item";
 import { ItemService } from "../../services/item/ItemService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";

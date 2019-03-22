@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { validate } from "class-validator";
 import { RegisterDto } from "../models/dto/RegisterDto";
-import { User } from "../models/entity/User";
+import User from "../models/entity/User";
 import { ValidationException } from "../utils/exceptions/ValidationException";
 
 export class UserService {
@@ -18,7 +18,6 @@ export class UserService {
       lastName,
       password: hashedPassword,
       isActive: true,
-      createdDate: new Date(),
       loginFailureCount: 0
     });
 

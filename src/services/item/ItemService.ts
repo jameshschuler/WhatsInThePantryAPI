@@ -1,5 +1,5 @@
 import ItemDto from "../../models/dto/Item/ItemDto";
-import { Item } from "../../models/entity/Item";
+import Item from "../../models/entity/Item";
 import { ItemAmount } from "../../models/entity/ItemAmount";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemLocation } from "../../models/entity/ItemLocation";
