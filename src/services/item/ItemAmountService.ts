@@ -21,7 +21,7 @@ export class ItemAmountService {
     const itemAmount = await ItemAmount.findOne(id);
 
     if (!itemAmount) {
-      throw new ValidationException("NotFound", 404, [
+      throw new ValidationException("NotFoundError", 404, [
         "Could not find item amount."
       ]);
     }

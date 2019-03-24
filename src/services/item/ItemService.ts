@@ -94,7 +94,7 @@ export class ItemService implements IItemService {
   ): Promise<Array<Item>> {
     const itemCategory = await ItemCategory.findOne({ id: categoryId });
     if (!itemCategory) {
-      throw new ValidationException("ValidationError", 400, [
+      throw new ValidationException("NotFoundError", 404, [
         "Invalid Item Category."
       ]);
     }
@@ -122,7 +122,7 @@ export class ItemService implements IItemService {
   ): Promise<Array<Item>> {
     const itemLocation = await ItemLocation.findOne({ id: locationId });
     if (!itemLocation) {
-      throw new ValidationException("ValidationError", 400, [
+      throw new ValidationException("NotFoundError", 404, [
         "Invalid Item Location."
       ]);
     }
@@ -159,7 +159,7 @@ export class ItemService implements IItemService {
     });
 
     if (!item) {
-      throw new ValidationException("NotFound", 404, ["Item not found."]);
+      throw new ValidationException("NotFoundError", 404, ["Item not found."]);
     }
     const {
       name,
@@ -210,12 +210,14 @@ export class ItemService implements IItemService {
     const itemLocation = await ItemLocation.findOne({ id: itemLocationId });
     const itemAmount = await ItemAmount.findOne({ id: itemAmountId });
     if (!itemAmount) {
-      throw new ValidationException("NotFound", 404, ["Invalid Item Amount."]);
+      throw new ValidationException("NotFoundError", 404, [
+        "Invalid Item Amount."
+      ]);
     }
 
     const itemCategory = await ItemCategory.findOne({ id: itemCategoryId });
     if (!itemCategory) {
-      throw new ValidationException("NotFound", 404, [
+      throw new ValidationException("NotFoundError", 404, [
         "Invalid Item Category."
       ]);
     }

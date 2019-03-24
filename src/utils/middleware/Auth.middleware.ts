@@ -31,19 +31,19 @@ const authMiddleware = async (
         req.user = user;
         next();
       } else {
-        res.status(400).json({
+        res.status(401).json({
           message: "Invalid Token.",
           errors: ["Token may have expired."]
         });
       }
     } catch (error) {
-      res.status(400).json({
+      res.status(401).json({
         message: "Invalid Token.",
         errors: ["Token may have expired."]
       });
     }
   } else {
-    res.status(400).json({
+    res.status(401).json({
       message: "Missing Token.",
       errors: ["Missing Token."]
     });

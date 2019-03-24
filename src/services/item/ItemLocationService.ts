@@ -27,7 +27,7 @@ export class ItemLocationService {
     const itemLocation = await ItemLocation.findOne(id);
 
     if (!itemLocation) {
-      throw new ValidationException("NotFound", 404, [
+      throw new ValidationException("NotFoundError", 404, [
         "Could not find item location."
       ]);
     }

@@ -38,9 +38,9 @@ class AccountController extends BaseController {
 
       const { usernameOrEmail, password } = req.body;
 
-      const data = await this.accountService.login(usernameOrEmail, password);
+      const user = await this.accountService.login(usernameOrEmail, password);
 
-      await res.send({ user: data });
+      await res.send({ user });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,

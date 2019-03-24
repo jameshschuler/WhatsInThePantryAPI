@@ -31,8 +31,8 @@ class ItemController extends BaseController {
       authMiddleware,
       this.getItemsByLocation
     );
-    this.router.get(this.path, authMiddleware, this.getItems);
-    this.router.get(`${this.path}/me`, authMiddleware, this.getItemsByUserId);
+    //this.router.get(this.path, authMiddleware, this.getItems);
+    this.router.get(`${this.path}`, authMiddleware, this.getItemsByUser);
     this.router.post(this.path, authMiddleware, this.createItem);
     this.router.put(this.path, authMiddleware, this.updateItem);
   }
@@ -98,7 +98,7 @@ class ItemController extends BaseController {
   /**
    *
    */
-  public getItemsByUserId = async (
+  public getItemsByUser = async (
     req: RequestWithUser,
     res: express.Response
   ) => {

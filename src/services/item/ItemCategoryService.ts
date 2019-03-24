@@ -27,7 +27,7 @@ export class ItemCategoryService {
     const itemCategory = await ItemCategory.findOne(id);
 
     if (!itemCategory) {
-      throw new ValidationException("NotFound", 404, [
+      throw new ValidationException("NotFoundError", 404, [
         "Could not find item category."
       ]);
     }
