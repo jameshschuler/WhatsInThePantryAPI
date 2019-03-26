@@ -2,6 +2,7 @@ import { Length } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import Item from "./Item";
 import MyBaseEntity from "./MyBaseEntity";
+import PantryItem from "./PantryItem";
 
 @Entity()
 export class ItemLocation extends MyBaseEntity {
@@ -14,6 +15,9 @@ export class ItemLocation extends MyBaseEntity {
   })
   name: string;
 
-  @OneToMany(() => Item, item => item.itemLocation)
+  @OneToMany(() => Item, item => item.defaultItemLocation)
   items: Item[];
+
+  @OneToMany(() => PantryItem, pantryItem => pantryItem.itemLocation)
+  pantryItems: PantryItem[];
 }

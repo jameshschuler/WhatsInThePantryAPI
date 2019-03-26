@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class PantryDto {
+class CreateEditPantryDto {
   @IsString()
   @IsNotEmpty({ message: "Must enter a pantry name." })
   public name: string;
 }
+
+export default CreateEditPantryDto;

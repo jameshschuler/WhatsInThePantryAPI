@@ -1,5 +1,7 @@
 import { Length, MaxLength } from "class-validator";
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -25,32 +27,33 @@ export default class Item extends MyBaseEntity {
   name: string;
 
   @Column({ nullable: true })
-  price: string;
-
-  @Column({ nullable: true })
-  unit: string;
-
-  @Column({ nullable: true })
   @MaxLength(1000, {
     message: "Description cannot be larger than 1000 characters in length."
   })
   description: string;
 
   @ManyToOne(() => ItemAmount, itemAmount => itemAmount.items)
-  itemAmount: ItemAmount;
-
-  @ManyToOne(() => ItemAmount, itemAmount => itemAmount.items)
-  currentItemAmount: ItemAmount;
+  defaultItemAmount: ItemAmount;
 
   @ManyToOne(() => ItemCategory, itemCategory => itemCategory.items)
   itemCategory: ItemCategory;
 
   @ManyToOne(() => ItemLocation, itemLocation => itemLocation.items)
-  itemLocation: ItemLocation;
+  defaultItemLocation: ItemLocation;
 
   @OneToMany(() => PantryItem, pantryItem => pantryItem.item)
   pantryItems: PantryItem[];
 
   @ManyToOne(() => User, user => user.items)
   user: User;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    this.createdAt = new Date();
+  }
+
+  @BeforeUpdate()
+  setUpdatedAt() {
+    this.updatedAt = new Date();
+  }
 }

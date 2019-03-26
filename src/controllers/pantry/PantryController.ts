@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
 import express from "express";
-import { PantryDto } from "../../models/dto/pantry/PantryDto";
+import CreateEditPantryDto from "../../models/dto/pantry/CreateEditPantryDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
 import {
   IPantryService,
@@ -50,13 +50,18 @@ class PantryContoller extends BaseController implements IController {
    */
   public create = async (req: RequestWithUser, res: express.Response) => {
     try {
-      await this.validateModelState(PantryDto, req.body);
+      await this.validateModelState(CreateEditPantryDto, req.body);
 
-      const pantryDto = plainToClass(PantryDto, req.body as PantryDto);
+      const pantryDto = plainToClass(
+        CreateEditPantryDto,
+        req.body as CreateEditPantryDto
+      );
       const user = req.user!;
-      const pantry = await this.pantryService.create(pantryDto, user);
+      await this.pantryService.create(pantryDto, user);
 
-      await res.status(200).send(pantry);
+      res
+        .status(200)
+        .send({ message: `Successfully created pantry (${pantryDto.name}).` });
     } catch (err) {
       await res.status(500).send({
         message: err.message,

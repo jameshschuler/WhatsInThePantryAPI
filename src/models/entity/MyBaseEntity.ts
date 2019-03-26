@@ -6,11 +6,11 @@ export default class MyBaseEntity extends BaseEntity {
   @Exclude()
   createdBy: number;
 
-  @Column({ default: new Date() })
+  @Column({ nullable: true })
   @Exclude()
   updatedAt: Date;
 
-  @Column({ default: new Date() })
+  @Column({ nullable: true })
   @Exclude()
   createdAt: Date;
 }

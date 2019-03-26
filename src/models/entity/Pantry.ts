@@ -1,5 +1,12 @@
 import { Length } from "class-validator";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from "typeorm";
 import MyBaseEntity from "./MyBaseEntity";
 import PantryItem from "./PantryItem";
 import PantryUser from "./PantryUser";
@@ -23,4 +30,14 @@ export class Pantry extends MyBaseEntity {
 
   @OneToMany(() => PantryItem, pantryItem => pantryItem.pantry)
   pantryItems: PantryItem[];
+
+  @BeforeInsert()
+  setCreatedAt() {
+    this.createdAt = new Date();
+  }
+
+  @BeforeUpdate()
+  setUpdatedAt() {
+    this.updatedAt = new Date();
+  }
 }

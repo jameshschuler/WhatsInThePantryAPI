@@ -1,16 +1,12 @@
-import ItemDto from "../../models/dto/Item/ItemDto";
+import { default as CreateEditItemDto } from "../../models/dto/Item/CreateEditItemDto";
 import Item from "../../models/entity/Item";
 import { ItemAmount } from "../../models/entity/ItemAmount";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemLocation } from "../../models/entity/ItemLocation";
+import User from "../../models/entity/User";
 import { ValidationException } from "../../utils/exceptions/ValidationException";
 
-interface IItemService {
-  /**
-   * @description - Gets all items (max: 50)
-   */
-  getItems(): Promise<Array<Item>>;
-
+export interface IItemService {
   /**
    * @description - Gets all items created by current logged in user (max: 50)
    */
@@ -18,56 +14,27 @@ interface IItemService {
 
   /**
    *
-   * @param categoryId
-   * @param quantity
+   * @param createEditItemDto
+   * @param user
    */
-  getItemsByCategory(
-    categoryId: number,
-    quantity: number
-  ): Promise<Array<Item>>;
+  update(createEditItemDto: CreateEditItemDto, user: User): Promise<void>;
 
   /**
    *
-   * @param locationId
-   * @param quantity
+   * @param createEditItemDto
+   * @param user
    */
-  getItemsByLocation(
-    locationId: number,
-    quantity: number
-  ): Promise<Array<Item>>;
+  create(createEditItemDto: CreateEditItemDto, user: User): Promise<void>;
 
   /**
    *
-   * @param itemDto
-   * @param userId
+   * @param itemId
+   * @param user
    */
-  update(itemDto: ItemDto, userId: number): Promise<Item>;
-
-  /**
-   *
-   * @param itemDto
-   * @param userId
-   */
-  create(itemDto: ItemDto, userId: number): Promise<Item>;
+  delete(itemId: number, user: User): Promise<void>;
 }
 
 export class ItemService implements IItemService {
-  constructor() {}
-
-  public async getItems(quantity: number = 50): Promise<Array<Item>> {
-    const items = await Item.find({
-      take: quantity,
-      relations: [
-        "itemAmount",
-        "currentItemAmount",
-        "itemCategory",
-        "itemLocation"
-      ]
-    });
-
-    return items;
-  }
-
   public async getItemsByUserId(
     userId: number,
     quantity: number = 50
@@ -77,189 +44,142 @@ export class ItemService implements IItemService {
         createdBy: userId
       },
       take: quantity,
-      relations: [
-        "itemAmount",
-        "itemCategory",
-        "itemLocation",
-        "currentItemAmount"
-      ]
+      relations: ["defaultItemAmount", "itemCategory", "defaultItemLocation"]
     });
 
     return items;
   }
 
-  public async getItemsByCategory(
-    categoryId: number,
-    quantity: number = 50
-  ): Promise<Array<Item>> {
-    const itemCategory = await ItemCategory.findOne({ id: categoryId });
-    if (!itemCategory) {
-      throw new ValidationException("NotFoundError", 404, [
-        "Invalid Item Category."
-      ]);
+  public async update(
+    createEditItemDto: CreateEditItemDto,
+    user: User
+  ): Promise<void> {
+    const {
+      id,
+      name,
+      description,
+      itemCategoryId,
+      defaultItemAmountId,
+      defaultItemLocationId
+    } = createEditItemDto;
+    const item = await this.getUserItem(id, user);
+
+    item.name = name || item.name;
+    item.description = description || item.description;
+    item.itemCategory =
+      itemCategoryId !== undefined
+        ? await this.getItemCategory(itemCategoryId)
+        : item.itemCategory;
+    item.defaultItemAmount =
+      defaultItemAmountId !== undefined
+        ? await this.getItemAmount(defaultItemAmountId)
+        : item.defaultItemAmount;
+
+    if (defaultItemLocationId !== undefined) {
+      item.defaultItemLocation = await this.getItemLocation(
+        defaultItemLocationId
+      );
     }
 
-    const items = await Item.find({
-      where: { itemCategory },
-      take: quantity,
-      relations: [
-        "itemAmount",
-        "itemCategory",
-        "itemLocation",
-        "currentItemAmount"
-      ]
-    });
+    await item.save();
+  }
 
-    return items;
+  public async create(
+    createEditItemDto: CreateEditItemDto,
+    user: User
+  ): Promise<void> {
+    const {
+      name,
+      description,
+      itemCategoryId,
+      defaultItemAmountId,
+      defaultItemLocationId
+    } = createEditItemDto;
+
+    const itemCategory = await this.getItemCategory(itemCategoryId);
+    const itemAmount = await this.getItemAmount(defaultItemAmountId);
+    const itemLocation =
+      defaultItemLocationId !== undefined
+        ? await this.getItemLocation(defaultItemLocationId)
+        : undefined;
+
+    await Item.create({
+      name,
+      description,
+      createdBy: user.id,
+      user,
+      itemCategory,
+      defaultItemAmount: itemAmount,
+      defaultItemLocation: itemLocation
+    }).save();
+  }
+
+  public async delete(itemId: number, user: User): Promise<void> {
+    console.log(itemId, user);
+    // TODO: will need to decide how deleting affects pantry items
+    throw new Error("Method not implemented.");
   }
 
   /**
    *
+   * @param itemId
+   * @param user
    */
-  public async getItemsByLocation(
-    locationId: number,
-    quantity: number = 50
-  ): Promise<Array<Item>> {
-    const itemLocation = await ItemLocation.findOne({ id: locationId });
-    if (!itemLocation) {
-      throw new ValidationException("NotFoundError", 404, [
-        "Invalid Item Location."
-      ]);
-    }
-
-    const items = await Item.find({
-      where: { itemLocation },
-      take: quantity,
-      relations: [
-        "itemAmount",
-        "itemCategory",
-        "itemLocation",
-        "currentItemAmount"
-      ]
-    });
-
-    return items;
-  }
-
-  /**
-   * @description - Gets all items created by current logged in user (max: 50)
-   */
-  public async update(itemDto: ItemDto, userId: number): Promise<Item> {
+  private async getUserItem(itemId: number, user: User): Promise<Item> {
     const item = await Item.findOne({
-      where: {
-        createdBy: userId,
-        id: itemDto.id
-      },
-      relations: [
-        "itemAmount",
-        "itemCategory",
-        "itemLocation",
-        "currentItemAmount"
-      ]
+      id: itemId,
+      user
     });
 
     if (!item) {
       throw new ValidationException("NotFoundError", 404, ["Item not found."]);
     }
-    const {
-      name,
-      price,
-      unit,
-      description,
-      itemCategoryId,
-      itemAmountId,
-      currentItemAmountId,
-      itemLocationId
-    } = itemDto;
 
-    // update item data
-    item.name = name || item.name;
-    item.price = price || item.price;
-    item.unit = unit || item.unit;
-    item.description = description || item.description;
-    item.updatedAt = new Date();
-
-    // Update entity relations
-    item.itemCategory =
-      (await this.getItemCategory(itemCategoryId)) || item.itemCategory;
-    item.itemAmount =
-      (await this.getItemAmount(itemAmountId)) || item.itemAmount;
-    item.currentItemAmount =
-      (await this.getItemAmount(currentItemAmountId)) || item.currentItemAmount;
-
-    item.itemLocation =
-      itemLocationId !== undefined
-        ? (await this.getItemLocation(itemLocationId)) || item.itemLocation
-        : item.itemLocation;
-
-    const updatedItem = await item.save();
-    return updatedItem;
+    return item;
   }
 
-  public async create(itemDto: ItemDto, userId: number): Promise<Item> {
-    const {
-      name,
-      price,
-      unit,
-      description,
-      itemLocationId,
-      itemAmountId,
-      itemCategoryId
-    } = itemDto;
-
-    const itemLocation = await ItemLocation.findOne({ id: itemLocationId });
-    const itemAmount = await ItemAmount.findOne({ id: itemAmountId });
-    if (!itemAmount) {
-      throw new ValidationException("NotFoundError", 404, [
-        "Invalid Item Amount."
-      ]);
-    }
-
-    const itemCategory = await ItemCategory.findOne({ id: itemCategoryId });
+  /**
+   *
+   * @param id
+   */
+  private async getItemCategory(id: number): Promise<ItemCategory> {
+    const itemCategory = await ItemCategory.findOne(id);
     if (!itemCategory) {
       throw new ValidationException("NotFoundError", 404, [
-        "Invalid Item Category."
+        "Item Category not found."
       ]);
     }
 
-    const newItem = await Item.create({
-      name,
-      price,
-      unit,
-      description,
-      itemLocation,
-      itemAmount,
-      currentItemAmount: itemAmount,
-      itemCategory,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      createdBy: userId
-    }).save();
-
-    return newItem;
+    return itemCategory;
   }
 
   /**
    *
    * @param id
    */
-  private async getItemCategory(id: number): Promise<ItemCategory | undefined> {
-    return await ItemCategory.findOne(id);
+  private async getItemAmount(id: number): Promise<ItemAmount> {
+    const itemAmount = await ItemAmount.findOne(id);
+    if (!itemAmount) {
+      throw new ValidationException("NotFoundError", 404, [
+        "Item Amount not found."
+      ]);
+    }
+
+    return itemAmount;
   }
 
   /**
    *
    * @param id
    */
-  private async getItemAmount(id: number): Promise<ItemAmount | undefined> {
-    return await ItemAmount.findOne(id);
-  }
+  private async getItemLocation(id: number): Promise<ItemLocation> {
+    const itemLocation = await ItemLocation.findOne(id);
+    if (!itemLocation) {
+      throw new ValidationException("NotFoundError", 404, [
+        "Item Location not found."
+      ]);
+    }
 
-  /**
-   *
-   * @param id
-   */
-  private async getItemLocation(id: number): Promise<ItemLocation | undefined> {
-    return await ItemLocation.findOne(id);
+    return itemLocation;
   }
 }

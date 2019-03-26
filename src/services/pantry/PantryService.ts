@@ -1,4 +1,4 @@
-import { PantryDto } from "../../models/dto/pantry/PantryDto";
+import CreateEditPantryDto from "../../models/dto/pantry/CreateEditPantryDto";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryUser from "../../models/entity/PantryUser";
 import User from "../../models/entity/User";
@@ -10,7 +10,7 @@ export interface IPantryService {
    * @param pantryDto
    * @param user
    */
-  create(pantryDto: PantryDto, user: User): Promise<Pantry>;
+  create(pantryDto: CreateEditPantryDto, user: User): Promise<void>;
 
   /**
    *
@@ -45,14 +45,11 @@ export class PantryService implements IPantryService {
     return pantry;
   }
 
-  public async create(pantryDto: PantryDto, user: User): Promise<Pantry> {
-    const isUnique = await this.isPantryUnique(pantryDto.name, user);
-
-    if (isUnique === false) {
-      throw new ValidationException("ValidationError", 400, [
-        `Pantry name must be unique.`
-      ]);
-    }
+  public async create(
+    pantryDto: CreateEditPantryDto,
+    user: User
+  ): Promise<void> {
+    await this.isPantryUnique(pantryDto.name, user);
 
     const pantry = await Pantry.create({
       name: pantryDto.name,
@@ -68,8 +65,6 @@ export class PantryService implements IPantryService {
       canWrite: true,
       createdBy: user.id
     }).save();
-
-    return pantry;
   }
 
   /**
@@ -77,18 +72,22 @@ export class PantryService implements IPantryService {
    * @param name
    * @param user
    */
-  private async isPantryUnique(name: string, user: User): Promise<boolean> {
-    if (user.pantryUsers && user.pantryUsers.length > 0) {
+  private async isPantryUnique(name: string, user: User): Promise<void> {
+    if (user.pantryUsers) {
       for (let pantryUser of user.pantryUsers) {
         const pantry = await Pantry.findOne({ id: pantryUser.pantryId });
-        if (pantry) {
-          if (pantry.name === name) {
-            return false;
-          }
+        if (!pantry) {
+          throw new ValidationException("NotFoundError", 404, [
+            `Pantry (${name}) not found.`
+          ]);
+        }
+
+        if (pantry.name === name) {
+          throw new ValidationException("ValidationError", 400, [
+            `Pantry name must be unique.`
+          ]);
         }
       }
     }
-
-    return true;
   }
 }

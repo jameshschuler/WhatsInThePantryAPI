@@ -1,9 +1,9 @@
 import { plainToClass } from "class-transformer";
 import * as express from "express";
-import ItemDto from "../../models/dto/Item/ItemDto";
+import CreateEditItemDto from "../../models/dto/Item/CreateEditItemDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
 import Item from "../../models/entity/Item";
-import { ItemService } from "../../services/item/ItemService";
+import { IItemService, ItemService } from "../../services/item/ItemService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
 
@@ -11,7 +11,7 @@ class ItemController extends BaseController {
   public path = "/item";
   public router = express.Router();
 
-  private itemService: ItemService;
+  private itemService: IItemService;
 
   constructor() {
     super();
@@ -21,34 +21,29 @@ class ItemController extends BaseController {
   }
 
   private initializeRoutes() {
-    this.router.get(
-      this.path + "/category/:id",
-      authMiddleware,
-      this.getItemsByCategory
-    );
-    this.router.get(
-      this.path + "/location/:id",
-      authMiddleware,
-      this.getItemsByLocation
-    );
-    //this.router.get(this.path, authMiddleware, this.getItems);
     this.router.get(`${this.path}`, authMiddleware, this.getItemsByUser);
-    this.router.post(this.path, authMiddleware, this.createItem);
-    this.router.put(this.path, authMiddleware, this.updateItem);
+    this.router.post(this.path, authMiddleware, this.create);
+    this.router.put(this.path, authMiddleware, this.edit);
+    this.router.delete(this.path + "/:id", authMiddleware, this.delete);
   }
 
   /**
    *
    */
-  public createItem = async (req: RequestWithUser, res: express.Response) => {
+  public create = async (req: RequestWithUser, res: express.Response) => {
     try {
-      await this.validateModelState(ItemDto, req.body);
-      const itemDto = plainToClass(ItemDto, req.body as ItemDto);
+      await this.validateModelState(CreateEditItemDto, req.body);
+      const createEditItemDto = plainToClass(
+        CreateEditItemDto,
+        req.body as CreateEditItemDto
+      );
       const user = req.user!;
 
-      const item = await this.itemService.create(itemDto, user.id);
+      await this.itemService.create(createEditItemDto, user);
 
-      res.status(200).json({ item });
+      res.status(200).json({
+        message: `Successfully created item (${createEditItemDto.name}).`
+      });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,
@@ -60,16 +55,20 @@ class ItemController extends BaseController {
   /**
    *
    */
-  public updateItem = async (req: RequestWithUser, res: express.Response) => {
+  public edit = async (req: RequestWithUser, res: express.Response) => {
     try {
-      await this.validateModelState(ItemDto, req.body, true);
-      const itemDto = plainToClass(ItemDto, req.body as ItemDto);
+      await this.validateModelState(CreateEditItemDto, req.body, true);
+      const createEditItemDto = plainToClass(
+        CreateEditItemDto,
+        req.body as CreateEditItemDto
+      );
       const user = req.user!;
 
-      const item = await this.itemService.update(itemDto, user.id);
-      const plainItem = plainToClass(Item, item);
+      await this.itemService.update(createEditItemDto, user);
 
-      res.status(200).json({ item: plainItem });
+      res.status(200).json({
+        message: `Successfully updated item.`
+      });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,
@@ -81,12 +80,16 @@ class ItemController extends BaseController {
   /**
    *
    */
-  public getItems = async (_: RequestWithUser, res: express.Response) => {
+  public delete = async (req: RequestWithUser, res: express.Response) => {
     try {
-      const items = await this.itemService.getItems();
-      const plainItems = plainToClass(Item, items);
+      const user = req.user!;
+      const id = req.params.id;
 
-      res.status(200).json({ items: plainItems });
+      await this.itemService.delete(id, user);
+
+      res.status(200).json({
+        message: `Item was deleted.`
+      });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,
@@ -104,49 +107,7 @@ class ItemController extends BaseController {
   ) => {
     try {
       const user = req.user!;
-      const items = await this.itemService.getItemsByUserId(user.id);
-      const plainItems = plainToClass(Item, items);
-
-      res.status(200).json({ items: plainItems });
-    } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
-      });
-    }
-  };
-
-  /**
-   *
-   */
-  public getItemsByCategory = async (
-    req: RequestWithUser,
-    res: express.Response
-  ) => {
-    try {
-      const id = req.params.id;
-      const items = await this.itemService.getItemsByCategory(id);
-      const plainItems = plainToClass(Item, items);
-
-      res.status(200).json({ items: plainItems });
-    } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
-      });
-    }
-  };
-
-  /**
-   *
-   */
-  public getItemsByLocation = async (
-    req: RequestWithUser,
-    res: express.Response
-  ) => {
-    try {
-      const id = req.params.id;
-      const items = await this.itemService.getItemsByLocation(id);
+      const items = await this.itemService.getItemsByUserId(user.id, 50);
       const plainItems = plainToClass(Item, items);
 
       res.status(200).json({ items: plainItems });

@@ -21,11 +21,7 @@ class AccountController extends BaseController {
 
   private initializeRoutes() {
     this.router.post(this.path + "/login", this.login);
-    this.router.get(
-      this.path + "/current_user",
-      authMiddleware,
-      this.getLoggedInUser
-    );
+    this.router.get(this.path + "/me", authMiddleware, this.getLoggedInUser);
     this.router.get(this.path, authMiddleware, this.getAccountInformation);
   }
 

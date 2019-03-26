@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryColumn
+} from "typeorm";
 import MyBaseEntity from "./MyBaseEntity";
 import { Pantry } from "./Pantry";
 import User from "./User";
@@ -25,4 +32,14 @@ export default class PantryUser extends MyBaseEntity {
 
   @ManyToOne(() => Pantry, pantry => pantry.pantryUsers)
   pantry: Pantry;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    this.createdAt = new Date();
+  }
+
+  @BeforeUpdate()
+  setUpdatedAt() {
+    this.updatedAt = new Date();
+  }
 }

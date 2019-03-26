@@ -1,5 +1,7 @@
-import { Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import Item from "./Item";
+import { ItemAmount } from "./ItemAmount";
+import { ItemLocation } from "./ItemLocation";
 import MyBaseEntity from "./MyBaseEntity";
 import { Pantry } from "./Pantry";
 
@@ -16,4 +18,16 @@ export default class PantryItem extends MyBaseEntity {
 
   @ManyToOne(() => Pantry, pantry => pantry.pantryItems)
   pantry: Pantry;
+
+  @Column()
+  price: string;
+
+  @Column()
+  unit: string;
+
+  @ManyToOne(() => ItemAmount, itemAmount => itemAmount.items)
+  itemAmount: ItemAmount;
+
+  @ManyToOne(() => ItemLocation, itemLocation => itemLocation.items)
+  itemLocation: ItemLocation;
 }
