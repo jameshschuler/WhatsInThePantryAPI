@@ -8,9 +8,8 @@ import {
 } from "../../services/pantry/PantryService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
-import IController from "../IController";
 
-class PantryContoller extends BaseController implements IController {
+class PantryContoller extends BaseController {
   public path = "/pantry";
   public router = express.Router();
 
