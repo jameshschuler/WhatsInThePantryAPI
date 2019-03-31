@@ -1,6 +1,6 @@
 import { plainToClass } from "class-transformer";
 import * as express from "express";
-import CreateEditItemDto from "../../models/dto/Item/CreateEditItemDto";
+import CreateEditItemDto from "../../models/dto/item/CreateEditItemDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
 import Item from "../../models/entity/Item";
 import { IItemService, ItemService } from "../../services/item/ItemService";

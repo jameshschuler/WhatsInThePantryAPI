@@ -1,5 +1,5 @@
 import { ItemLocation } from "../../models/entity/ItemLocation";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export class ItemLocationService {
   constructor() {}
@@ -27,7 +27,7 @@ export class ItemLocationService {
     const itemLocation = await ItemLocation.findOne(id);
 
     if (!itemLocation) {
-      throw new ValidationException("NotFoundError", 404, [
+      throw new Exception(ErrorType.NotFound, 404, [
         "Could not find item location."
       ]);
     }

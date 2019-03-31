@@ -2,7 +2,7 @@ import CreateEditPantryDto from "../../models/dto/pantry/CreateEditPantryDto";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryUser from "../../models/entity/PantryUser";
 import User from "../../models/entity/User";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export interface IPantryService {
   /**
@@ -37,9 +37,7 @@ export class PantryService implements IPantryService {
     });
 
     if (!pantry) {
-      throw new ValidationException("NotFoundError", 404, [
-        "Pantry not found."
-      ]);
+      throw new Exception(ErrorType.NotFound, 404, ["Pantry not found."]);
     }
 
     return pantry;
@@ -77,13 +75,13 @@ export class PantryService implements IPantryService {
       for (let pantryUser of user.pantryUsers) {
         const pantry = await Pantry.findOne({ id: pantryUser.pantryId });
         if (!pantry) {
-          throw new ValidationException("NotFoundError", 404, [
+          throw new Exception(ErrorType.NotFound, 404, [
             `Pantry (${name}) not found.`
           ]);
         }
 
         if (pantry.name === name) {
-          throw new ValidationException("ValidationError", 400, [
+          throw new Exception(ErrorType.Validation, 400, [
             `Pantry name must be unique.`
           ]);
         }

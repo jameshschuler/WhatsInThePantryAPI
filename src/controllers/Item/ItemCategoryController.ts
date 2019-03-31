@@ -5,7 +5,7 @@ import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
 
 class ItemCategoryController extends BaseController {
-  public path = "/item_category";
+  public path = "/item/category";
   public router = express.Router();
 
   private itemCategoryService: ItemCategoryService;

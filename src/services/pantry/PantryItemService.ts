@@ -3,7 +3,7 @@ import Item from "../../models/entity/Item";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryItem from "../../models/entity/PantryItem";
 import User from "../../models/entity/User";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export interface IPantryItemService {
   addItem(pantryItemDto: PantryItemDto, user: User): Promise<void>;
@@ -26,9 +26,7 @@ export class PantryItemService implements IPantryItemService {
     });
 
     if (!pantry)
-      throw new ValidationException("NotFound", 404, [
-        "Unable to find pantry."
-      ]);
+      throw new Exception(ErrorType.NotFound, 404, ["Unable to find pantry."]);
 
     const item = await Item.findOne({
       id: pantryItemDto.itemId,
@@ -36,13 +34,11 @@ export class PantryItemService implements IPantryItemService {
     });
 
     if (!item)
-      throw new ValidationException("NotFoundError", 404, [
-        "Unable to find item."
-      ]);
+      throw new Exception(ErrorType.NotFound, 404, ["Unable to find item."]);
 
     const doesAlreadyExist = this.doesItemAlreadyExist(pantry, item);
     if (doesAlreadyExist) {
-      throw new ValidationException("ValidationError", 401, [
+      throw new Exception(ErrorType.Validation, 400, [
         "Item has already been added to this pantry."
       ]);
     }

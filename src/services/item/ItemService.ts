@@ -1,10 +1,10 @@
-import { default as CreateEditItemDto } from "../../models/dto/Item/CreateEditItemDto";
+import { default as CreateEditItemDto } from "../../models/dto/item/CreateEditItemDto";
 import Item from "../../models/entity/Item";
 import { ItemAmount } from "../../models/entity/ItemAmount";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemLocation } from "../../models/entity/ItemLocation";
 import User from "../../models/entity/User";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export interface IItemService {
   /**
@@ -132,7 +132,7 @@ export class ItemService implements IItemService {
     });
 
     if (!item) {
-      throw new ValidationException("NotFoundError", 404, ["Item not found."]);
+      throw new Exception(ErrorType.NotFound, 404, ["Item not found."]);
     }
 
     return item;
@@ -145,7 +145,7 @@ export class ItemService implements IItemService {
   private async getItemCategory(id: number): Promise<ItemCategory> {
     const itemCategory = await ItemCategory.findOne(id);
     if (!itemCategory) {
-      throw new ValidationException("NotFoundError", 404, [
+      throw new Exception(ErrorType.NotFound, 404, [
         "Item Category not found."
       ]);
     }
@@ -160,9 +160,7 @@ export class ItemService implements IItemService {
   private async getItemAmount(id: number): Promise<ItemAmount> {
     const itemAmount = await ItemAmount.findOne(id);
     if (!itemAmount) {
-      throw new ValidationException("NotFoundError", 404, [
-        "Item Amount not found."
-      ]);
+      throw new Exception(ErrorType.NotFound, 404, ["Item Amount not found."]);
     }
 
     return itemAmount;
@@ -175,7 +173,7 @@ export class ItemService implements IItemService {
   private async getItemLocation(id: number): Promise<ItemLocation> {
     const itemLocation = await ItemLocation.findOne(id);
     if (!itemLocation) {
-      throw new ValidationException("NotFoundError", 404, [
+      throw new Exception(ErrorType.NotFound, 404, [
         "Item Location not found."
       ]);
     }

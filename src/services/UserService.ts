@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { validate } from "class-validator";
 import { RegisterDto } from "../models/dto/RegisterDto";
 import User from "../models/entity/User";
-import { ValidationException } from "../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../utils/exceptions/Exception";
 
 export class UserService {
   constructor() {}
@@ -36,7 +36,7 @@ export class UserService {
         });
       }
 
-      throw new ValidationException("Validation Error!", 400, parsedErrors);
+      throw new Exception(ErrorType.Validation, 400, parsedErrors);
     }
 
     await this.validateEmailUniqueness(email);
@@ -54,7 +54,7 @@ export class UserService {
     const user = await User.findOne({ email });
     if (user != null) {
       if (email === user.email) {
-        throw new ValidationException("Validation Error!", 400, [
+        throw new Exception(ErrorType.Validation, 400, [
           {
             property: "Email",
             messages: [`Email (${email}) is already in use.`]
@@ -72,7 +72,7 @@ export class UserService {
     const user = await User.findOne({ username });
     if (user != null) {
       if (username === user.username) {
-        throw new ValidationException("Validation Error!", 400, [
+        throw new Exception(ErrorType.Validation, 400, [
           {
             property: "Username",
             messages: [`Username (${username}) is already in use.`]
@@ -105,7 +105,7 @@ export class UserService {
     }
 
     if (messages.length > 0) {
-      throw new ValidationException("Validation Error!", 400, [
+      throw new Exception(ErrorType.Validation, 400, [
         {
           property: "Password",
           messages

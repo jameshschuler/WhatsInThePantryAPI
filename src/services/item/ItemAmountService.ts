@@ -1,5 +1,5 @@
 import { ItemAmount } from "../../models/entity/ItemAmount";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export class ItemAmountService {
   constructor() {}
@@ -21,7 +21,7 @@ export class ItemAmountService {
     const itemAmount = await ItemAmount.findOne(id);
 
     if (!itemAmount) {
-      throw new ValidationException("NotFoundError", 404, [
+      throw new Exception(ErrorType.NotFound, 404, [
         "Could not find item amount."
       ]);
     }

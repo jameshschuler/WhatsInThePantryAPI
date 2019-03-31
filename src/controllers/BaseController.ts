@@ -1,7 +1,7 @@
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import express from "express";
-import { ValidationException } from "../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../utils/exceptions/Exception";
 import IController from "./IController";
 
 export default class BaseController implements IController {
@@ -16,21 +16,15 @@ export default class BaseController implements IController {
     const errors = await validate(plainToClass(type, body), {
       skipMissingProperties
     });
+
     if (errors.length > 0) {
       let parsedErrors = [];
       for (let error of errors) {
-        let messages = [];
-        for (let i in error.constraints) {
-          messages.push(error.constraints[i]);
-        }
-
-        parsedErrors.push({
-          property: error.property,
-          messages
-        });
+        const message = Object.values(error.constraints);
+        parsedErrors.push(...message);
       }
 
-      throw new ValidationException("Validation Error!", 400, parsedErrors);
+      throw new Exception(ErrorType.Validation, 400, parsedErrors);
     }
   }
 }

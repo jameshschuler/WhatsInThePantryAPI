@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from "class-validator";
 class CreateEditItemDto {
   public id: number;
 
-  @IsString()
+  @IsString({ message: "Name must be letters only." })
   @IsNotEmpty({ message: "Must enter an item name." })
   public name: string;
 

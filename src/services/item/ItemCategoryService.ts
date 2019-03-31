@@ -1,5 +1,5 @@
 import { ItemCategory } from "../../models/entity/ItemCategory";
-import { ValidationException } from "../../utils/exceptions/ValidationException";
+import { ErrorType, Exception } from "../../utils/exceptions/Exception";
 
 export class ItemCategoryService {
   constructor() {}
@@ -27,7 +27,7 @@ export class ItemCategoryService {
     const itemCategory = await ItemCategory.findOne(id);
 
     if (!itemCategory) {
-      throw new ValidationException("NotFoundError", 404, [
+      throw new Exception(ErrorType.NotFound, 404, [
         "Could not find item category."
       ]);
     }

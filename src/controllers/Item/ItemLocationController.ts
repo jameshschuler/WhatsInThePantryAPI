@@ -5,7 +5,7 @@ import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
 
 class ItemLocationController extends BaseController {
-  public path = "/item_location";
+  public path = "/item/location";
   public router = express.Router();
 
   private itemLocationService: ItemLocationService;
