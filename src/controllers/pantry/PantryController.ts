@@ -26,7 +26,21 @@ class PantryContoller extends BaseController {
   private initializeRoutes() {
     this.router.post(this.path, authMiddleware, this.create);
     this.router.get(this.path + "/:id", authMiddleware, this.getPantry);
+    this.router.get(this.path, authMiddleware, this.getPantries);
   }
+
+  public getPantries = async (req: RequestWithUser, res: express.Response) => {
+    try {
+      const pantries = await this.pantryService.getPantries(req.user!);
+
+      res.status(200).json({ pantries });
+    } catch (err) {
+      await res.status(500).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
 
   public getPantry = async (req: RequestWithUser, res: express.Response) => {
     try {
@@ -34,7 +48,7 @@ class PantryContoller extends BaseController {
         req.params.id,
         req.user!
       );
-
+      // FIXME: WHAT?
       await res.status(200).send(pantry);
     } catch (err) {
       await res.status(500).send({

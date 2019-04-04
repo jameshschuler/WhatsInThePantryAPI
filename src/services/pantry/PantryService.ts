@@ -18,9 +18,34 @@ export interface IPantryService {
    * @param user
    */
   getPantry(pantryId: number, user: User): Promise<Pantry>;
+
+  /**
+   *
+   * @param user
+   */
+  getPantries(user: User): Promise<Array<Pantry>>;
 }
 
 export class PantryService implements IPantryService {
+  public async getPantries(user: User): Promise<Array<Pantry>> {
+    const pantries = await Pantry.find({
+      where: {
+        createdBy: user.id
+      },
+      select: ["name", "isShared", "createdAt"]
+      // TODO: what do we actually want to send?
+      // join: {
+      //   alias: "pantry",
+      //   leftJoinAndSelect: {
+      //     homes: "pantry.pantryItems",
+      //     homeType: "homes.item"
+      //   }
+      // }
+    });
+
+    return pantries;
+  }
+
   public async getPantry(pantryId: number, user: User): Promise<Pantry> {
     const pantry = await Pantry.findOne({
       where: {

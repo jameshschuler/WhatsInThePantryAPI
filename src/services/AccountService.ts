@@ -94,7 +94,7 @@ export class AccountService {
    * @param user
    */
   createToken(user: User) {
-    const expiresIn = 60 * 60 * 24; // a day
+    const expiresIn = 60 * 60 * 24 * 7; // a week
     const secret = process.env.JWT_SECRET!;
     const dataStoredInToken: DataStoredInToken = {
       id: user.id,
