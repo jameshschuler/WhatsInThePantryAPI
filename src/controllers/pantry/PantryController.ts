@@ -49,7 +49,7 @@ class PantryContoller extends BaseController {
         req.user!
       );
       // FIXME: WHAT?
-      await res.status(200).send(pantry);
+      await res.status(200).json(pantry);
     } catch (err) {
       await res.status(500).send({
         message: err.message,

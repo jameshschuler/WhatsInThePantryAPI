@@ -32,7 +32,7 @@ export class PantryService implements IPantryService {
       where: {
         createdBy: user.id
       },
-      select: ["name", "isShared", "createdAt"]
+      select: ["id", "name", "isShared", "createdAt"]
       // TODO: what do we actually want to send?
       // join: {
       //   alias: "pantry",
