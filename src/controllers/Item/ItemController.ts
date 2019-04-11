@@ -22,6 +22,11 @@ class ItemController extends BaseController {
 
   private initializeRoutes() {
     this.router.get(`${this.path}`, authMiddleware, this.getItemsByUser);
+    this.router.get(
+      `${this.path}/autocomplete`,
+      authMiddleware,
+      this.getItemsAutocomplete
+    );
     this.router.post(this.path, authMiddleware, this.create);
     this.router.put(this.path, authMiddleware, this.edit);
     this.router.delete(this.path + "/:id", authMiddleware, this.delete);
@@ -111,6 +116,23 @@ class ItemController extends BaseController {
       const plainItems = plainToClass(Item, items);
 
       res.status(200).json({ items: plainItems });
+    } catch (err) {
+      await res.status(err.status).send({
+        message: err.message,
+        errors: err.errors
+      });
+    }
+  };
+
+  public getItemsAutocomplete = async (
+    req: RequestWithUser,
+    res: express.Response
+  ) => {
+    try {
+      const user = req.user!;
+      const items = await this.itemService.getItemsAutocomplete(user.id);
+
+      res.status(200).json({ items });
     } catch (err) {
       await res.status(err.status).send({
         message: err.message,

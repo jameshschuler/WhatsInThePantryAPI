@@ -13,6 +13,11 @@ export interface IItemService {
   getItemsByUserId(userId: number, quantity: number): Promise<Array<Item>>;
 
   /**
+   * @description - Gets all items created by current logged in user (max: 50)
+   */
+  getItemsAutocomplete(userId: number): Promise<Array<Object>>;
+
+  /**
    *
    * @param createEditItemDto
    * @param user
@@ -35,6 +40,25 @@ export interface IItemService {
 }
 
 export class ItemService implements IItemService {
+  public async getItemsAutocomplete(userId: number): Promise<Array<Object>> {
+    const items = await Item.find({
+      where: {
+        createdBy: userId
+      },
+      select: ["id", "name"]
+    });
+
+    let autocomplete = [];
+    for (let item of items) {
+      autocomplete.push({
+        label: item.name,
+        value: item.id
+      });
+    }
+
+    return autocomplete;
+  }
+
   public async getItemsByUserId(
     userId: number,
     quantity: number = 50

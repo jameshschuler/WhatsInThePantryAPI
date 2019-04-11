@@ -1,5 +1,7 @@
 import { PantryItemDto } from "../../models/dto/pantry/PantryItemDto";
 import Item from "../../models/entity/Item";
+import { ItemAmount } from "../../models/entity/ItemAmount";
+import { ItemLocation } from "../../models/entity/ItemLocation";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryItem from "../../models/entity/PantryItem";
 import User from "../../models/entity/User";
@@ -16,10 +18,18 @@ export class PantryItemService implements IPantryItemService {
     pantryItemDto: PantryItemDto,
     user: User
   ): Promise<void> {
-    // TODO: how can we handle adding an item to a pantry we don't own?
+    const {
+      pantryId,
+      itemId,
+      price,
+      unit,
+      itemAmountId,
+      itemLocationId
+    } = pantryItemDto;
+
     const pantry = await Pantry.findOne({
       where: {
-        id: pantryItemDto.pantryId,
+        id: pantryId,
         createdBy: user.id
       },
       relations: ["pantryItems"]
@@ -29,7 +39,7 @@ export class PantryItemService implements IPantryItemService {
       throw new Exception(ErrorType.NotFound, 404, ["Unable to find pantry."]);
 
     const item = await Item.findOne({
-      id: pantryItemDto.itemId,
+      id: itemId,
       createdBy: user.id
     });
 
@@ -43,11 +53,30 @@ export class PantryItemService implements IPantryItemService {
       ]);
     }
 
+    const itemAmount = await await ItemAmount.findOne({
+      id: itemAmountId
+    });
+    if (!item)
+      throw new Exception(ErrorType.NotFound, 404, [
+        "Unable to find item amount."
+      ]);
+
+    let itemLocation = undefined;
+    if (itemLocationId) {
+      itemLocation = await ItemLocation.findOne({
+        id: itemLocationId
+      });
+    }
+
     // We're good to add item to pantry
     await PantryItem.create({
       itemId: item.id,
       pantryId: pantry.id,
-      createdBy: user.id
+      createdBy: user.id,
+      price,
+      unit,
+      itemAmount,
+      itemLocation
     }).save();
   }
 

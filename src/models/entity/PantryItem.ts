@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryColumn
+} from "typeorm";
 import Item from "./Item";
 import { ItemAmount } from "./ItemAmount";
 import { ItemLocation } from "./ItemLocation";
@@ -30,4 +37,14 @@ export default class PantryItem extends MyBaseEntity {
 
   @ManyToOne(() => ItemLocation, itemLocation => itemLocation.items)
   itemLocation: ItemLocation;
+
+  @BeforeInsert()
+  setCreatedAt() {
+    this.createdAt = new Date();
+  }
+
+  @BeforeUpdate()
+  setUpdatedAt() {
+    this.updatedAt = new Date();
+  }
 }

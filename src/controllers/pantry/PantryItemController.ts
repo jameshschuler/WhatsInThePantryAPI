@@ -11,7 +11,7 @@ import BaseController from "../BaseController";
 import IController from "../IController";
 
 class PantryItemController extends BaseController implements IController {
-  public path = "/pantry_item";
+  public path = "/pantry/item";
   public router = express.Router();
 
   private pantryItemService: IPantryItemService;
@@ -43,6 +43,7 @@ class PantryItemController extends BaseController implements IController {
 
       await res.status(200).send();
     } catch (err) {
+      console.log({ err });
       await res.status(500).send({
         message: err.message,
         errors: err.errors
