@@ -1,5 +1,6 @@
 import { plainToClass } from "class-transformer";
 import * as express from "express";
+import APIResponse from "../../models/dto/APIResponse";
 import CreateEditItemDto from "../../models/dto/item/CreateEditItemDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
 import Item from "../../models/entity/Item";
@@ -46,14 +47,22 @@ class ItemController extends BaseController {
 
       await this.itemService.create(createEditItemDto, user);
 
-      res.status(200).json({
-        message: `Successfully created item (${createEditItemDto.name}).`
-      });
+      const response = new APIResponse(
+        "Created",
+        201,
+        [`Successfully created item (${createEditItemDto.name}).`],
+        {}
+      );
+
+      res.json(response);
     } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
-      });
+      const { status, ErrorType, message, errors } = err;
+
+      res.status(status).send(
+        new APIResponse(ErrorType, status, [message], {
+          errors
+        })
+      );
     }
   };
 
@@ -114,13 +123,19 @@ class ItemController extends BaseController {
       const user = req.user!;
       const items = await this.itemService.getItemsByUserId(user.id, 50);
       const plainItems = plainToClass(Item, items);
-
-      res.status(200).json({ items: plainItems });
-    } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
+      const response = new APIResponse("ok", 200, [], {
+        items: plainItems
       });
+
+      res.json(response);
+    } catch (err) {
+      const { status, ErrorType, message, errors } = err;
+
+      res.status(status).send(
+        new APIResponse(ErrorType, status, [message], {
+          errors
+        })
+      );
     }
   };
 

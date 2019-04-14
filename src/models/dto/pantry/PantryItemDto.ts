@@ -1,16 +1,14 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty } from "class-validator";
 
 export class PantryItemDto {
   @IsNotEmpty({ message: "Must select an item." })
-  @IsString({ message: "Must select an item." })
-  public itemId: any;
+  public itemId: number;
 
   @IsNotEmpty({ message: "Must select a pantry." })
   public pantryId: number;
 
   @IsNotEmpty({ message: "Must enter a price." })
-  @IsString({ message: "Price must be in currency format." })
-  public price: any;
+  public price: string;
 
   @IsNotEmpty({ message: "Must enter a unit." })
   public unit: string;

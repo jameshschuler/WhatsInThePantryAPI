@@ -41,7 +41,9 @@ class PantryItemController extends BaseController implements IController {
       );
       await this.pantryItemService.addItem(pantryItemDto, req.user!);
 
-      await res.status(200).send();
+      await res.status(200).send({
+        message: `Successfully created pantry item.`
+      });
     } catch (err) {
       console.log({ err });
       await res.status(500).send({

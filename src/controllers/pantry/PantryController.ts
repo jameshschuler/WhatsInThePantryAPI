@@ -1,5 +1,6 @@
 import { plainToClass } from "class-transformer";
 import express from "express";
+import APIResponse from "../../models/dto/APIResponse";
 import CreateEditPantryDto from "../../models/dto/pantry/CreateEditPantryDto";
 import RequestWithUser from "../../models/dto/RequestWithUser";
 import {
@@ -71,14 +72,22 @@ class PantryContoller extends BaseController {
       const user = req.user!;
       await this.pantryService.create(pantryDto, user);
 
-      res
-        .status(200)
-        .send({ message: `Successfully created pantry (${pantryDto.name}).` });
+      const response = new APIResponse(
+        "Created",
+        201,
+        [`Successfully created pantry (${pantryDto.name}).`],
+        {}
+      );
+
+      res.json(response);
     } catch (err) {
-      await res.status(500).send({
-        message: err.message,
-        errors: err.errors
-      });
+      const { status, ErrorType, message, errors } = err;
+
+      res.status(status).send(
+        new APIResponse(ErrorType, status, [message], {
+          errors
+        })
+      );
     }
   };
 }

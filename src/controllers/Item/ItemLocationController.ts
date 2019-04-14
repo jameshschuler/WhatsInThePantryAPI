@@ -1,5 +1,8 @@
+import { plainToClass } from "class-transformer";
 import * as express from "express";
+import APIResponse from "../../models/dto/APIResponse";
 import RequestWithUser from "../../models/dto/RequestWithUser";
+import { ItemLocation } from "../../models/entity/ItemLocation";
 import { ItemLocationService } from "../../services/item/ItemLocationService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
 import BaseController from "../BaseController";
@@ -39,12 +42,20 @@ class ItemLocationController extends BaseController {
     try {
       const itemLocations = await this.itemLocationService.getItemLocations();
 
-      res.status(200).json({ itemLocations });
-    } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
+      const plainItemLocations = plainToClass(ItemLocation, itemLocations);
+      const response = new APIResponse("ok", 200, [], {
+        itemLocations: plainItemLocations
       });
+
+      res.json(response);
+    } catch (err) {
+      const { status, ErrorType, message, errors } = err;
+
+      res.status(status).send(
+        new APIResponse(ErrorType, status, [message], {
+          errors
+        })
+      );
     }
   };
 
