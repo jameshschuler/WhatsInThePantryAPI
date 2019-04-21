@@ -4,8 +4,9 @@ import jwt from "jsonwebtoken";
 import LoggedInDto from "../models//dto/LoggedInDto";
 import AccountDto from "../models/dto/account/AccountDto";
 import User from "../models/entity/User";
-import { ErrorType, Exception } from "../utils/exceptions/Exception";
+import { Exception } from "../utils/exceptions/Exception";
 import { DataStoredInToken } from "../utils/interfaces";
+import Status from "../utils/statusCodes";
 
 export class AccountService {
   private validator: Validator;
@@ -28,7 +29,7 @@ export class AccountService {
         user.lockoutDate &&
         Date.now() - user.lockoutDate.getTime() < ONE_HOUR
       ) {
-        throw new Exception(ErrorType.Validation, 400, [
+        throw new Exception(Status.BadRequest, [
           "Invalid credentials.",
           "Account has been locked for 1 hour."
         ]);
@@ -54,7 +55,7 @@ export class AccountService {
       await this.processLoginFailed(user);
       return null;
     } else {
-      throw new Exception(ErrorType.Validation, 400, ["Invalid credentials."]);
+      throw new Exception(Status.BadRequest, ["Invalid credentials."]);
     }
   }
 
@@ -69,7 +70,7 @@ export class AccountService {
       };
     }
 
-    throw new Exception(ErrorType.Validation, 400, [
+    throw new Exception(Status.BadRequest, [
       "Unable to login. Please try again."
     ]);
   }
@@ -83,7 +84,7 @@ export class AccountService {
         username: user.username
       };
     } else {
-      throw new Exception(ErrorType.NotFound, 404, [
+      throw new Exception(Status.NotFound, [
         "Unable to retrieve account information. Please try again."
       ]);
     }
@@ -115,12 +116,12 @@ export class AccountService {
       user.loginFailureCount += 1;
       await user.save();
 
-      throw new Exception(ErrorType.Validation, 400, ["Invalid credentials."]);
+      throw new Exception(Status.BadRequest, ["Invalid credentials."]);
     } else {
       user.lockoutDate = new Date();
       await user.save();
 
-      throw new Exception(ErrorType.Validation, 400, [
+      throw new Exception(Status.BadRequest, [
         "Invalid credentials.",
         "Account has been locked for 1 hour."
       ]);
@@ -154,7 +155,7 @@ export class AccountService {
       this.validator.isEmpty(usernameOrEmail) ||
       this.validator.isEmpty(password)
     ) {
-      throw new Exception(ErrorType.Validation, 400, [
+      throw new Exception(Status.BadRequest, [
         "Must enter a username or email and password."
       ]);
     }

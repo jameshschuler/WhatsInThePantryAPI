@@ -5,14 +5,49 @@ import { ItemLocation } from "../../models/entity/ItemLocation";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryItem from "../../models/entity/PantryItem";
 import User from "../../models/entity/User";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export interface IPantryItemService {
+  /**
+   *
+   * @param pantryItemDto
+   * @param user
+   */
   addItem(pantryItemDto: PantryItemDto, user: User): Promise<void>;
+
+  /**
+   *
+   * @param pantryId
+   * @param user
+   */
+  getPantryItems(pantryId: number, user: User): Promise<Array<PantryItem>>;
 }
 
 export class PantryItemService implements IPantryItemService {
-  constructor() {}
+  public async getPantryItems(
+    pantryId: number,
+    user: User
+  ): Promise<Array<PantryItem>> {
+    const pantry = await Pantry.findOne({
+      id: pantryId
+    });
+
+    if (!pantry) {
+      throw new Exception(Status.NotFound, ["Unable to find pantry."]);
+    }
+
+    const pantryItems = await PantryItem.find({
+      where: {
+        createdBy: user.id,
+        pantry: pantry
+      },
+      select: ["price", "unit"],
+      relations: ["item"]
+    });
+
+    return pantryItems;
+  }
 
   public async addItem(
     pantryItemDto: PantryItemDto,
@@ -36,19 +71,18 @@ export class PantryItemService implements IPantryItemService {
     });
 
     if (!pantry)
-      throw new Exception(ErrorType.NotFound, 404, ["Unable to find pantry."]);
+      throw new Exception(Status.NotFound, ["Unable to find pantry."]);
 
     const item = await Item.findOne({
       id: itemId,
       createdBy: user.id
     });
 
-    if (!item)
-      throw new Exception(ErrorType.NotFound, 404, ["Unable to find item."]);
+    if (!item) throw new Exception(Status.NotFound, ["Unable to find item."]);
 
     const doesAlreadyExist = this.doesItemAlreadyExist(pantry, item);
     if (doesAlreadyExist) {
-      throw new Exception(ErrorType.Validation, 400, [
+      throw new Exception(Status.BadRequest, [
         "Item has already been added to this pantry."
       ]);
     }
@@ -57,9 +91,7 @@ export class PantryItemService implements IPantryItemService {
       id: itemAmountId
     });
     if (!item)
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Unable to find item amount."
-      ]);
+      throw new Exception(Status.NotFound, ["Unable to find item amount."]);
 
     let itemLocation = undefined;
     if (itemLocationId) {

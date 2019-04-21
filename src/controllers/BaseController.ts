@@ -1,7 +1,8 @@
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import express from "express";
-import { ErrorType, Exception } from "../utils/exceptions/Exception";
+import { Exception } from "../utils/exceptions/Exception";
+import Status from "../utils/statusCodes";
 import IController from "./IController";
 
 export default class BaseController implements IController {
@@ -24,7 +25,7 @@ export default class BaseController implements IController {
         parsedErrors.push(...message);
       }
 
-      throw new Exception(ErrorType.Validation, 400, parsedErrors);
+      throw new Exception(Status.BadRequest, parsedErrors);
     }
   }
 }

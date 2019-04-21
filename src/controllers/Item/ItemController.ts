@@ -6,6 +6,7 @@ import RequestWithUser from "../../models/dto/RequestWithUser";
 import Item from "../../models/entity/Item";
 import { IItemService, ItemService } from "../../services/item/ItemService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
+import Status from "../../utils/statusCodes";
 import BaseController from "../BaseController";
 
 class ItemController extends BaseController {
@@ -48,18 +49,17 @@ class ItemController extends BaseController {
       await this.itemService.create(createEditItemDto, user);
 
       const response = new APIResponse(
-        "Created",
-        201,
+        Status.Created,
         [`Successfully created item (${createEditItemDto.name}).`],
         {}
       );
 
       res.json(response);
     } catch (err) {
-      const { status, ErrorType, message, errors } = err;
+      const { status, code, errors, message } = err;
 
-      res.status(status).send(
-        new APIResponse(ErrorType, status, [message], {
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
           errors
         })
       );
@@ -123,16 +123,16 @@ class ItemController extends BaseController {
       const user = req.user!;
       const items = await this.itemService.getItemsByUserId(user.id, 50);
       const plainItems = plainToClass(Item, items);
-      const response = new APIResponse("ok", 200, [], {
+      const response = new APIResponse(Status.Ok, [], {
         items: plainItems
       });
 
       res.json(response);
     } catch (err) {
-      const { status, ErrorType, message, errors } = err;
+      const { status, code, errors, message } = err;
 
-      res.status(status).send(
-        new APIResponse(ErrorType, status, [message], {
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
           errors
         })
       );

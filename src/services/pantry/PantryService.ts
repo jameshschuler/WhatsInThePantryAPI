@@ -2,7 +2,8 @@ import CreateEditPantryDto from "../../models/dto/pantry/CreateEditPantryDto";
 import { Pantry } from "../../models/entity/Pantry";
 import PantryUser from "../../models/entity/PantryUser";
 import User from "../../models/entity/User";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export interface IPantryService {
   /**
@@ -32,15 +33,16 @@ export class PantryService implements IPantryService {
       where: {
         createdBy: user.id
       },
-      select: ["id", "name", "isShared", "createdAt"]
-      // TODO: what do we actually want to send?
-      // join: {
-      //   alias: "pantry",
-      //   leftJoinAndSelect: {
-      //     homes: "pantry.pantryItems",
-      //     homeType: "homes.item"
-      //   }
-      // }
+      select: ["id", "name", "isShared", "createdAt"],
+      order: {
+        createdAt: "DESC"
+      },
+      join: {
+        alias: "pantry",
+        leftJoinAndSelect: {
+          pantryItems: "pantry.pantryItems"
+        }
+      }
     });
 
     return pantries;
@@ -62,7 +64,7 @@ export class PantryService implements IPantryService {
     });
 
     if (!pantry) {
-      throw new Exception(ErrorType.NotFound, 404, ["Pantry not found."]);
+      throw new Exception(Status.NotFound, ["Pantry not found."]);
     }
 
     return pantry;
@@ -100,13 +102,11 @@ export class PantryService implements IPantryService {
       for (let pantryUser of user.pantryUsers) {
         const pantry = await Pantry.findOne({ id: pantryUser.pantryId });
         if (!pantry) {
-          throw new Exception(ErrorType.NotFound, 404, [
-            `Pantry (${name}) not found.`
-          ]);
+          throw new Exception(Status.NotFound, [`Pantry (${name}) not found.`]);
         }
 
         if (pantry.name === name) {
-          throw new Exception(ErrorType.Validation, 400, [
+          throw new Exception(Status.BadRequest, [
             `Pantry name must be unique.`
           ]);
         }

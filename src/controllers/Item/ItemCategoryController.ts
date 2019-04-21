@@ -5,6 +5,7 @@ import RequestWithUser from "../../models/dto/RequestWithUser";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemCategoryService } from "../../services/item/ItemCategoryService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
+import Status from "../../utils/statusCodes";
 import BaseController from "../BaseController";
 
 class ItemCategoryController extends BaseController {
@@ -43,16 +44,16 @@ class ItemCategoryController extends BaseController {
       const itemCategories = await this.itemCategoryService.getItemCategories();
 
       const plainItemCategories = plainToClass(ItemCategory, itemCategories);
-      const response = new APIResponse("ok", 200, [], {
+      const response = new APIResponse(Status.Ok, [], {
         itemCategories: plainItemCategories
       });
 
       res.json(response);
     } catch (err) {
-      const { status, ErrorType, message, errors } = err;
+      const { status, code, errors, message } = err;
 
-      res.status(status).send(
-        new APIResponse(ErrorType, status, [message], {
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
           errors
         })
       );

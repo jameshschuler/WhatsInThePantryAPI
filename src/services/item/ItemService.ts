@@ -4,7 +4,8 @@ import { ItemAmount } from "../../models/entity/ItemAmount";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemLocation } from "../../models/entity/ItemLocation";
 import User from "../../models/entity/User";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export interface IItemService {
   /**
@@ -156,7 +157,7 @@ export class ItemService implements IItemService {
     });
 
     if (!item) {
-      throw new Exception(ErrorType.NotFound, 404, ["Item not found."]);
+      throw new Exception(Status.NotFound, ["Item not found."]);
     }
 
     return item;
@@ -169,9 +170,7 @@ export class ItemService implements IItemService {
   private async getItemCategory(id: number): Promise<ItemCategory> {
     const itemCategory = await ItemCategory.findOne(id);
     if (!itemCategory) {
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Item Category not found."
-      ]);
+      throw new Exception(Status.NotFound, ["Item Category not found."]);
     }
 
     return itemCategory;
@@ -184,7 +183,7 @@ export class ItemService implements IItemService {
   private async getItemAmount(id: number): Promise<ItemAmount> {
     const itemAmount = await ItemAmount.findOne(id);
     if (!itemAmount) {
-      throw new Exception(ErrorType.NotFound, 404, ["Item Amount not found."]);
+      throw new Exception(Status.NotFound, ["Item Amount not found."]);
     }
 
     return itemAmount;
@@ -197,9 +196,7 @@ export class ItemService implements IItemService {
   private async getItemLocation(id: number): Promise<ItemLocation> {
     const itemLocation = await ItemLocation.findOne(id);
     if (!itemLocation) {
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Item Location not found."
-      ]);
+      throw new Exception(Status.NotFound, ["Item Location not found."]);
     }
 
     return itemLocation;

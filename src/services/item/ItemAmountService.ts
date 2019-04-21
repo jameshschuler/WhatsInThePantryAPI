@@ -1,5 +1,6 @@
 import { ItemAmount } from "../../models/entity/ItemAmount";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export class ItemAmountService {
   constructor() {}
@@ -21,9 +22,7 @@ export class ItemAmountService {
     const itemAmount = await ItemAmount.findOne(id);
 
     if (!itemAmount) {
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Could not find item amount."
-      ]);
+      throw new Exception(Status.NotFound, ["Could not find item amount."]);
     }
 
     return itemAmount;

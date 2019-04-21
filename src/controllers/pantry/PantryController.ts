@@ -8,6 +8,7 @@ import {
   PantryService
 } from "../../services/pantry/PantryService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
+import Status from "../../utils/statusCodes";
 import BaseController from "../BaseController";
 
 class PantryContoller extends BaseController {
@@ -33,13 +34,19 @@ class PantryContoller extends BaseController {
   public getPantries = async (req: RequestWithUser, res: express.Response) => {
     try {
       const pantries = await this.pantryService.getPantries(req.user!);
-
-      res.status(200).json({ pantries });
-    } catch (err) {
-      await res.status(500).send({
-        message: err.message,
-        errors: err.errors
+      const response = new APIResponse(Status.Ok, [], {
+        pantries
       });
+
+      res.json(response);
+    } catch (err) {
+      const { status, code, errors, message } = err;
+
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
+          errors
+        })
+      );
     }
   };
 
@@ -49,12 +56,19 @@ class PantryContoller extends BaseController {
         req.params.id,
         req.user!
       );
-      await res.status(200).json(pantry);
-    } catch (err) {
-      await res.status(500).send({
-        message: err.message,
-        errors: err.errors
+
+      const response = new APIResponse(Status.Ok, [], {
+        pantry
       });
+      res.json(response);
+    } catch (err) {
+      const { status, code, errors, message } = err;
+
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
+          errors
+        })
+      );
     }
   };
 
@@ -73,18 +87,17 @@ class PantryContoller extends BaseController {
       await this.pantryService.create(pantryDto, user);
 
       const response = new APIResponse(
-        "Created",
-        201,
+        Status.Created,
         [`Successfully created pantry (${pantryDto.name}).`],
         {}
       );
 
       res.json(response);
     } catch (err) {
-      const { status, ErrorType, message, errors } = err;
+      const { status, code, errors, message } = err;
 
-      res.status(status).send(
-        new APIResponse(ErrorType, status, [message], {
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
           errors
         })
       );

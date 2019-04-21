@@ -1,5 +1,6 @@
 import { ItemCategory } from "../../models/entity/ItemCategory";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export class ItemCategoryService {
   constructor() {}
@@ -27,9 +28,7 @@ export class ItemCategoryService {
     const itemCategory = await ItemCategory.findOne(id);
 
     if (!itemCategory) {
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Could not find item category."
-      ]);
+      throw new Exception(Status.NotFound, ["Could not find item category."]);
     }
 
     return itemCategory;

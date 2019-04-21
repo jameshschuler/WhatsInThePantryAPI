@@ -5,6 +5,7 @@ import RequestWithUser from "../../models/dto/RequestWithUser";
 import { ItemLocation } from "../../models/entity/ItemLocation";
 import { ItemLocationService } from "../../services/item/ItemLocationService";
 import authMiddleware from "../../utils/middleware/Auth.middleware";
+import Status from "../../utils/statusCodes";
 import BaseController from "../BaseController";
 
 class ItemLocationController extends BaseController {
@@ -43,19 +44,18 @@ class ItemLocationController extends BaseController {
       const itemLocations = await this.itemLocationService.getItemLocations();
 
       const plainItemLocations = plainToClass(ItemLocation, itemLocations);
-      const response = new APIResponse("ok", 200, [], {
+      const response = new APIResponse(Status.Ok, [], {
         itemLocations: plainItemLocations
       });
 
       res.json(response);
     } catch (err) {
-      const { status, ErrorType, message, errors } = err;
-
-      res.status(status).send(
-        new APIResponse(ErrorType, status, [message], {
-          errors
-        })
-      );
+      // const { status, ErrorType, message, errors } = err;
+      // res.status(status).send(
+      //   new APIResponse(ErrorType, status, [message], {
+      //     errors
+      //   })
+      // );
     }
   };
 

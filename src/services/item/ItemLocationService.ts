@@ -1,5 +1,6 @@
 import { ItemLocation } from "../../models/entity/ItemLocation";
-import { ErrorType, Exception } from "../../utils/exceptions/Exception";
+import { Exception } from "../../utils/exceptions/Exception";
+import Status from "../../utils/statusCodes";
 
 export class ItemLocationService {
   constructor() {}
@@ -27,9 +28,7 @@ export class ItemLocationService {
     const itemLocation = await ItemLocation.findOne(id);
 
     if (!itemLocation) {
-      throw new Exception(ErrorType.NotFound, 404, [
-        "Could not find item location."
-      ]);
+      throw new Exception(Status.NotFound, ["Could not find item location."]);
     }
 
     return itemLocation;
