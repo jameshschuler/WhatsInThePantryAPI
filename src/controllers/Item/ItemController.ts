@@ -101,14 +101,20 @@ class ItemController extends BaseController {
 
       await this.itemService.delete(id, user);
 
-      res.status(200).json({
-        message: `Item was deleted.`
-      });
+      const response = new APIResponse(
+        Status.Ok,
+        [`Successfully deleted item.`],
+        {}
+      );
+      res.json(response);
     } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
-      });
+      const { status, code, errors, message } = err;
+
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
+          errors
+        })
+      );
     }
   };
 

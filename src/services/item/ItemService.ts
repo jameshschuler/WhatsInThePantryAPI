@@ -3,6 +3,7 @@ import Item from "../../models/entity/Item";
 import { ItemAmount } from "../../models/entity/ItemAmount";
 import { ItemCategory } from "../../models/entity/ItemCategory";
 import { ItemLocation } from "../../models/entity/ItemLocation";
+import PantryItem from "../../models/entity/PantryItem";
 import User from "../../models/entity/User";
 import { Exception } from "../../utils/exceptions/Exception";
 import Status from "../../utils/statusCodes";
@@ -140,9 +141,21 @@ export class ItemService implements IItemService {
   }
 
   public async delete(itemId: number, user: User): Promise<void> {
-    console.log(itemId, user);
-    // TODO: will need to decide how deleting affects pantry items
-    throw new Error("Method not implemented.");
+    const item = await Item.findOne(
+      { id: itemId, createdBy: user.id },
+      {
+        relations: ["pantryItems"]
+      }
+    );
+    if (!item) {
+      throw new Exception(Status.NotFound, ["Item not found."]);
+    }
+
+    if (item.pantryItems.length > 0) {
+      await PantryItem.remove(item.pantryItems);
+    }
+
+    await Item.delete(item);
   }
 
   /**
