@@ -18,10 +18,10 @@ async function main() {
 
   const app = new App(
     [
-      new ItemController(),
       new ItemLocationController(),
       new ItemCategoryController(),
       new ItemAmountController(),
+      new ItemController(),
       new UserController(),
       new AccountController(),
       new PantryContoller(),

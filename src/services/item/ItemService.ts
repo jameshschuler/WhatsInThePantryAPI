@@ -15,6 +15,11 @@ export interface IItemService {
   getItemsByUserId(userId: number, quantity: number): Promise<Array<Item>>;
 
   /**
+   * @description - Gets an item based on the provided user id and item id
+   */
+  getItem(userId: number, itemId: number): Promise<Item>;
+
+  /**
    * @description - Gets all items created by current logged in user (max: 50)
    */
   getItemsAutocomplete(userId: number): Promise<Array<Object>>;
@@ -74,6 +79,22 @@ export class ItemService implements IItemService {
     });
 
     return items;
+  }
+
+  public async getItem(userId: number, itemId: number): Promise<Item> {
+    const item = await Item.findOne({
+      where: {
+        createdBy: userId,
+        id: itemId
+      },
+      relations: ["defaultItemAmount", "itemCategory", "defaultItemLocation"]
+    });
+
+    if (!item) {
+      throw new Exception(Status.NotFound, ["Item not found."]);
+    }
+
+    return item;
   }
 
   public async update(

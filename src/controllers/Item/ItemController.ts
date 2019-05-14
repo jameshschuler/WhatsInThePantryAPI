@@ -23,14 +23,16 @@ class ItemController extends BaseController {
   }
 
   private initializeRoutes() {
+    this.router.get(this.path + "/:id", authMiddleware, this.getItem);
     this.router.get(`${this.path}`, authMiddleware, this.getItemsByUser);
     this.router.get(
       `${this.path}/autocomplete`,
       authMiddleware,
       this.getItemsAutocomplete
     );
+
     this.router.post(this.path, authMiddleware, this.create);
-    this.router.put(this.path, authMiddleware, this.edit);
+    this.router.put(this.path, authMiddleware, this.update);
     this.router.delete(this.path + "/:id", authMiddleware, this.delete);
   }
 
@@ -69,7 +71,7 @@ class ItemController extends BaseController {
   /**
    *
    */
-  public edit = async (req: RequestWithUser, res: express.Response) => {
+  public update = async (req: RequestWithUser, res: express.Response) => {
     try {
       await this.validateModelState(CreateEditItemDto, req.body, true);
       const createEditItemDto = plainToClass(
@@ -80,14 +82,21 @@ class ItemController extends BaseController {
 
       await this.itemService.update(createEditItemDto, user);
 
-      res.status(200).json({
-        message: `Successfully updated item.`
-      });
+      const response = new APIResponse(
+        Status.Ok,
+        [`Successfully updated item.`],
+        {}
+      );
+
+      res.json(response);
     } catch (err) {
-      await res.status(err.status).send({
-        message: err.message,
-        errors: err.errors
-      });
+      const { status, code, errors, message } = err;
+
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
+          errors
+        })
+      );
     }
   };
 
@@ -131,6 +140,32 @@ class ItemController extends BaseController {
       const plainItems = plainToClass(Item, items);
       const response = new APIResponse(Status.Ok, [], {
         items: plainItems
+      });
+
+      res.json(response);
+    } catch (err) {
+      const { status, code, errors, message } = err;
+
+      res.status(code).send(
+        new APIResponse(Status[status] as any, [message], {
+          errors
+        })
+      );
+    }
+  };
+
+  /**
+   * @description - Gets an item given a user id and item id
+   */
+  public getItem = async (req: RequestWithUser, res: express.Response) => {
+    try {
+      const user = req.user!;
+      const id = req.params.id;
+
+      const item = await this.itemService.getItem(user.id, id);
+      const plainItem = plainToClass(Item, item);
+      const response = new APIResponse(Status.Ok, [], {
+        item: plainItem
       });
 
       res.json(response);
